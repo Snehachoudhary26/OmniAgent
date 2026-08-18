@@ -1,10 +1,115 @@
 /**
- * OmniAgent Studio Complete Event Controller with Party Popper Cannon
+ * OmniAgent Studio Complete Controller with Mechanical Typing Sound Engine
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+
+// Luxury Cyber Sound & Mechanical Typing Synthesizer
+function playCyberSound(type) {
+    if (!soundEnabled) return;
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'type') {
+            // ⌨️ Tactile Mechanical Keyboard Switch Click ("Thock")
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            // Realistic switch frequency variation
+            const baseFreq = 700 + Math.random() * 400;
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(baseFreq, now);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.4, now + 0.035);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1600, now);
+
+            gain.gain.setValueAtTime(0.09, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+            osc.start(now);
+            osc.stop(now + 0.035);
+        } else if (type === 'click') {
+            // Elegant glass tactile click
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        } else if (type === 'send') {
+            // High-voltage warp swoosh chord
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + i * 0.03);
+                gain.gain.setValueAtTime(0.08, now + i * 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                osc.start(now + i * 0.03);
+                osc.stop(now + 0.22);
+            });
+        } else if (type === 'step') {
+            // Futuristic pulse chime
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(987.77, now);
+            osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.09);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+            osc.start(now);
+            osc.stop(now + 0.09);
+        } else if (type === 'alert') {
+            // Human approval critical alert
+            [440, 880].forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, now + i * 0.1);
+                gain.gain.setValueAtTime(0.15, now + i * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.start(now + i * 0.1);
+                osc.stop(now + 0.25);
+            });
+        } else if (type === 'complete') {
+            // Triumph harmonic victory chord
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                gain.gain.setValueAtTime(0.14, now + idx * 0.07);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                osc.start(now + idx * 0.07);
+                osc.stop(now + 0.45);
+            });
+        }
+    } catch (e) {}
+}
 
 // Global Theme Toggle
 window.toggleTheme = function() {
@@ -27,81 +132,6 @@ function applyTheme(theme) {
         if (knob) knob.textContent = '🌙';
         if (window.orbitalBg) window.orbitalBg.setTheme('dark');
     }
-}
-
-function playCyberSound(type) {
-    if (!soundEnabled) return;
-    try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        const now = audioCtx.currentTime;
-
-        if (type === 'click') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, now);
-            osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
-            gain.gain.setValueAtTime(0.12, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-            osc.start(now);
-            osc.stop(now + 0.05);
-        } else if (type === 'send') {
-            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(freq, now + i * 0.03);
-                gain.gain.setValueAtTime(0.08, now + i * 0.03);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-                osc.start(now + i * 0.03);
-                osc.stop(now + 0.22);
-            });
-        } else if (type === 'step') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(987.77, now);
-            osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.09);
-            gain.gain.setValueAtTime(0.12, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
-            osc.start(now);
-            osc.stop(now + 0.09);
-        } else if (type === 'alert') {
-            [440, 880].forEach((freq, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(freq, now + i * 0.1);
-                gain.gain.setValueAtTime(0.15, now + i * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                osc.start(now + i * 0.1);
-                osc.stop(now + 0.25);
-            });
-        } else if (type === 'complete') {
-            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-                gain.gain.setValueAtTime(0.14, now + idx * 0.07);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-                osc.start(now + idx * 0.07);
-                osc.stop(now + 0.45);
-            });
-        }
-    } catch (e) {}
 }
 
 window.toggleAudio = function() {
@@ -422,7 +452,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('user-input');
 
     if (btnSend) btnSend.addEventListener('click', sendUserPrompt);
-    if (input) input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendUserPrompt();
-    });
+    if (input) {
+        // ⌨️ Mechanical Keyboard Typing Audio on Keystrokes
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendUserPrompt();
+            } else {
+                playCyberSound('type');
+            }
+        });
+    }
 });
