@@ -18,8 +18,6 @@
                 <div id="brand-logo-container" onclick="showSection('chat')" style="cursor:pointer;"></div>
             </div>
 
-            <div class="header-divider-vertical"></div>
-
             <div class="header-title-block">
                 <h1 id="view-title">Autonomous Reasoning Studio</h1>
                 <span class="header-subtitle" id="view-subtitle">ReAct Planning • Multi-Agent Swarm • Human-in-the-Loop</span>
@@ -209,115 +207,114 @@ def compute_squares(n):
 
 print(compute_squares(10))"></textarea>
 
-                        <div class="code-actions-footer">
-                            <button class="btn-run-code" onclick="executeSandboxCode()">
-                                <span>▶️ Run Code</span>
-                            </button>
-                            <button class="btn-agent-optimize" onclick="sendCodeToAgent()">
-                                <span>🤖 Ask Agent to Refactor</span>
-                            </button>
-                            <span id="code-latency-badge" class="code-latency-badge">Latency: 0 ms</span>
-                        </div>
-                    </div>
-
-                    <!-- Live Output Console -->
-                    <div class="code-output-card">
-                        <div class="code-output-header">
-                            <span>📟 Execution Console Output (stdout)</span>
-                            <span id="code-status-pill" class="code-status-pill">Ready</span>
-                        </div>
-                        <pre id="sandbox-console-output" class="code-console-body">Press '▶️ Run Code' to execute your Python script...</pre>
-                    </div>
-                </div>
-
-                <!-- 4. Multi-Tools Registry View -->
-                <div class="tools-canvas view-section" id="tools-section" style="display:none;">
-                    <div class="tools-header-banner">
-                        <h2>🛠️ Active Dynamic Tool Registry</h2>
-                        <p>Live capability-based execution tools available to the autonomous agent.</p>
-                    </div>
-                    <div class="tools-grid" id="tools-grid-list"></div>
-                </div>
-
-                <!-- 5. Vector Vault Memory View -->
-                <div class="memory-canvas view-section" id="memory-section" style="display:none;">
-                    <div class="memory-header-banner">
-                        <h2>🧠 Long-Term Semantic Vector Vault</h2>
-                        <p>Persistent facts and document knowledge recalled during ReAct reasoning.</p>
-                    </div>
-
-                    <div class="dropzone-card" id="vault-dropzone" onclick="document.getElementById('vault-file-input').click()">
-                        <input type="file" id="vault-file-input" style="display:none;" accept=".txt,.md,.json,.csv,.py,.pdf" onchange="handleFileUpload(event)">
-                        <div class="dropzone-icon">📂</div>
-                        <div class="dropzone-title">Drag & Drop Documents Here to Index Knowledge</div>
-                        <div class="dropzone-subtitle">Supports <code>.txt</code>, <code>.md</code>, <code>.json</code>, <code>.csv</code>, <code>.py</code> • Auto-Chunked & Vector Indexed</div>
-                    </div>
-                    
-                    <div class="memory-input-card">
-                        <h3>➕ Store New Fact Manually</h3>
-                        <div class="memory-form">
-                            <input type="text" id="mem-new-tag" placeholder="Tag (e.g. UserGoal, Preference)..." class="mem-input-tag">
-                            <input type="text" id="mem-new-text" placeholder="Fact content to store in long-term memory..." class="mem-input-text">
-                            <button class="btn-approve" onclick="saveNewMemory()">Store Fact</button>
-                        </div>
-                    </div>
-
-                    <div class="vault-items-grid" id="vault-items-grid"></div>
-                </div>
-
-                <!-- Input Bar -->
-                <div class="input-dock">
-                    <div class="input-wrapper">
-                        <input type="text" id="user-input" class="input-box" placeholder="Ask anything or click a starter card above..." autofocus>
-                        <button id="btn-send" class="btn-send" title="Send Request">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    <div class="code-actions-footer">
+                        <button class="btn-run-code" onclick="executeSandboxCode()">
+                            <span>▶️ Run Code</span>
                         </button>
+                        <button class="btn-agent-optimize" onclick="sendCodeToAgent()">
+                            <span>🤖 Ask Agent to Refactor</span>
+                        </button>
+                        <span id="code-latency-badge" class="code-latency-badge">Latency: 0 ms</span>
                     </div>
                 </div>
-            </main>
 
-            <!-- Right Observability HUD Panel -->
-            <aside class="metrics-panel" id="metrics-panel">
-                <div class="panel-section-title">📊 Live Observability HUD</div>
+                <!-- Live Output Console -->
+                <div class="code-output-card">
+                    <div class="code-output-header">
+                        <span>📟 Execution Console Output (stdout)</span>
+                        <span id="code-status-pill" class="code-status-pill">Ready</span>
+                    </div>
+                    <pre id="sandbox-console-output" class="code-console-body">Press '▶️ Run Code' to execute your Python script...</pre>
+                </div>
+            </div>
+
+            <!-- 4. Multi-Tools Registry View -->
+            <div class="tools-canvas view-section" id="tools-section" style="display:none;">
+                <div class="tools-header-banner">
+                    <h2>🛠️ Active Dynamic Tool Registry</h2>
+                    <p>Live capability-based execution tools available to the autonomous agent.</p>
+                </div>
+                <div class="tools-grid" id="tools-grid-list"></div>
+            </div>
+
+            <!-- 5. Vector Vault Memory View -->
+            <div class="memory-canvas view-section" id="memory-section" style="display:none;">
+                <div class="memory-header-banner">
+                    <h2>🧠 Long-Term Semantic Vector Vault</h2>
+                    <p>Persistent facts and document knowledge recalled during ReAct reasoning.</p>
+                </div>
+
+                <div class="dropzone-card" id="vault-dropzone" onclick="document.getElementById('vault-file-input').click()">
+                    <input type="file" id="vault-file-input" style="display:none;" accept=".txt,.md,.json,.csv,.py,.pdf" onchange="handleFileUpload(event)">
+                    <div class="dropzone-icon">📂</div>
+                    <div class="dropzone-title">Drag & Drop Documents Here to Index Knowledge</div>
+                    <div class="dropzone-subtitle">Supports <code>.txt</code>, <code>.md</code>, <code>.json</code>, <code>.csv</code>, <code>.py</code> • Auto-Chunked & Vector Indexed</div>
+                </div>
                 
-                <div class="metric-card">
-                    <div class="metric-val" id="metric-tokens">0</div>
-                    <div class="metric-label">Total Tokens Processed</div>
-                    <div class="cyber-wave-container">
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
+                <div class="memory-input-card">
+                    <h3>➕ Store New Fact Manually</h3>
+                    <div class="memory-form">
+                        <input type="text" id="mem-new-tag" placeholder="Tag (e.g. UserGoal, Preference)..." class="mem-input-tag">
+                        <input type="text" id="mem-new-text" placeholder="Fact content to store in long-term memory..." class="mem-input-text">
+                        <button class="btn-approve" onclick="saveNewMemory()">Store Fact</button>
                     </div>
                 </div>
 
-                <div class="metric-card">
-                    <div class="metric-val" id="metric-latency">0 ms</div>
-                    <div class="metric-label">Real-Time Latency</div>
-                </div>
+                <div class="vault-items-grid" id="vault-items-grid"></div>
+            </div>
 
-                <div class="metric-card">
-                    <div class="metric-val" id="metric-cost">$0.000000</div>
-                    <div class="metric-label">Estimated Cost (Free Student Tier)</div>
+            <!-- Input Bar -->
+            <div class="input-dock">
+                <div class="input-wrapper">
+                    <input type="text" id="user-input" class="input-box" placeholder="Ask anything or click a starter card above..." autofocus>
+                    <button id="btn-send" class="btn-send" title="Send Request">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </button>
                 </div>
+            </div>
+        </main>
 
-                <div class="panel-section-title">🧠 Long-Term Memory Vault</div>
-                <div class="memory-chip-list" id="memory-chip-list">
-                    <div class="memory-chip">📌 Architecture: Hybrid ReAct Planner</div>
-                    <div class="memory-chip">📌 Safety: Human Approval Gateway Active</div>
-                    <div class="memory-chip">📌 Persona: Senior Software Architect</div>
+        <!-- Right Observability HUD Panel -->
+        <aside class="metrics-panel" id="metrics-panel">
+            <div class="panel-section-title">📊 Live Observability HUD</div>
+            
+            <div class="metric-card">
+                <div class="metric-val" id="metric-tokens">0</div>
+                <div class="metric-label">Total Tokens Processed</div>
+                <div class="cyber-wave-container">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
                 </div>
+            </div>
 
-                <!-- ⚡ Core: Ready Status Badge in Right Panel -->
-                <div class="agent-status-badge panel-bottom-status" onclick="runDiagnostics()" title="Click to test System Health & Latency">
-                    <div class="status-dot"></div>
-                    <span class="status-text">Core: Ready</span>
-                </div>
-            </aside>
-        </div>
+            <div class="metric-card">
+                <div class="metric-val" id="metric-latency">0 ms</div>
+                <div class="metric-label">Real-Time Latency</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-val" id="metric-cost">$0.000000</div>
+                <div class="metric-label">Estimated Cost (Free Student Tier)</div>
+            </div>
+
+            <div class="panel-section-title">🧠 Long-Term Memory Vault</div>
+            <div class="memory-chip-list" id="memory-chip-list">
+                <div class="memory-chip">📌 Architecture: Hybrid ReAct Planner</div>
+                <div class="memory-chip">📌 Safety: Human Approval Gateway Active</div>
+                <div class="memory-chip">📌 Persona: Senior Software Architect</div>
+            </div>
+
+            <!-- ⚡ Core: Ready Status Badge in Right Panel -->
+            <div class="agent-status-badge panel-bottom-status" onclick="runDiagnostics()" title="Click to test System Health & Latency">
+                <div class="status-dot"></div>
+                <span class="status-text">Core: Ready</span>
+            </div>
+        </aside>
     </div>
 
     <!-- Settings & Persona Modal -->

@@ -8,7 +8,7 @@ function renderHolographicLogo(containerId) {
     container.innerHTML = `
         <div class="omni-brand-core">
             <div class="gyro-logo-wrapper">
-                <svg class="gyro-svg" viewBox="0 0 100 100" width="56" height="56">
+                <svg class="gyro-svg" viewBox="0 0 100 100" width="46" height="46">
                     <circle cx="50" cy="50" r="44" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="16 8" class="spin-slow-cw" />
                     <ellipse cx="50" cy="50" rx="36" ry="18" fill="none" stroke="#cd0029" stroke-width="3" class="spin-fast-ccw" />
                     <ellipse cx="50" cy="50" rx="36" ry="18" fill="none" stroke="#ff3b5c" stroke-width="2" class="spin-tilt-cw" />
@@ -37,7 +37,6 @@ function renderHolographicLogo(containerId) {
             </div>
             <div class="brand-typography">
                 <div class="brand-main">OMNI<span class="cherry-text">AGENT</span></div>
-                <div class="brand-sub"><span class="pulse-live"></span>AUTONOMOUS STUDIO</div>
             </div>
         </div>
     `;
