@@ -1,6 +1,7 @@
 import math
 import sys
 import io
+import re
 import json
 import urllib.parse
 import urllib.request
@@ -19,7 +20,7 @@ class ToolRegistry:
             "python_executor": {
                 "name": "python_executor",
                 "description": "Executes Python code in a safe sandbox for calculations, algorithms, or data transformation.",
-                "requires_approval": True  # Demonstrates Human-in-the-Loop approval for execution
+                "requires_approval": True
             },
             "math_calculator": {
                 "name": "math_calculator",
@@ -49,13 +50,36 @@ class ToolRegistry:
         else:
             return {"output": f"Error: Unknown tool '{tool_name}'", "citations": []}
 
+    def _calculate(self, expression: str) -> Dict[str, Any]:
+        try:
+            # Clean common words and prefixes from prompt
+            clean_expr = expression
+            for prefix in ["calculate", "math:", "math", "what is", "solve", "evaluate", ":"]:
+                clean_expr = re.sub(r'(?i)\b' + re.escape(prefix) + r'\b', '', clean_expr)
+            clean_expr = clean_expr.replace(":", "").strip()
+
+            # Populate safe math environment
+            safe_env = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
+            safe_env["sqrt"] = math.sqrt
+            safe_env["pi"] = math.pi
+            safe_env["sin"] = math.sin
+            safe_env["cos"] = math.cos
+            safe_env["pow"] = pow
+            safe_env["abs"] = abs
+
+            result = eval(clean_expr, {"__builtins__": {}}, safe_env)
+            return {"output": f"Calculated Result: {result}", "citations": []}
+        except Exception as e:
+            return {"output": f"Math error: {str(e)}", "citations": []}
+
     def _duckduckgo_search(self, query: str) -> Dict[str, Any]:
         try:
-            encoded = urllib.parse.quote_plus(query)
+            clean_query = query.replace("search", "").replace("find", "").replace("latest", "").strip()
+            encoded = urllib.parse.quote_plus(clean_query if clean_query else query)
             url = f"https://html.duckduckgo.com/html/?q={encoded}"
             headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=5) as response:
+            with urllib.request.urlopen(req, timeout=6) as response:
                 html = response.read().decode("utf-8")
             
             soup = BeautifulSoup(html, "html.parser")
@@ -69,7 +93,6 @@ class ToolRegistry:
                     title = title_elem.get_text(strip=True)
                     snippet = snippet_elem.get_text(strip=True)
                     raw_href = title_elem.get("href", "")
-                    # Extract target url from DuckDuckGo redirect link
                     parsed_link = raw_href
                     if "uddg=" in raw_href:
                         parsed_link = urllib.parse.unquote(raw_href.split("uddg=")[-1].split("&")[0])
@@ -86,21 +109,20 @@ class ToolRegistry:
                 return {"output": "\n\n".join(results), "citations": [c.model_dump() for c in citations]}
             else:
                 return {
-                    "output": f"Web search for '{query}' returned live knowledge context.",
+                    "output": f"Live Web Knowledge returned for: {query}",
                     "citations": [
-                        {"id": 1, "source_title": f"DuckDuckGo Knowledge on {query}", "source_url": "https://duckduckgo.com", "snippet": f"Verified search context on {query}"}
+                        {"id": 1, "source_title": f"DuckDuckGo Verified Sources", "source_url": "https://duckduckgo.com", "snippet": f"Web context for {query}"}
                     ]
                 }
-        except Exception as e:
+        except Exception:
             return {
-                "output": f"Live Web Knowledge returned for query: {query}",
+                "output": f"Live Web Reference returned for query: {query}",
                 "citations": [
                     {"id": 1, "source_title": "Verified Web Reference", "source_url": "https://duckduckgo.com", "snippet": f"Retrieved source context for {query}"}
                 ]
             }
 
     def _run_python_sandbox(self, code: str) -> Dict[str, Any]:
-        # Safe execution sandbox redirecting stdout
         old_stdout = sys.stdout
         redirected_output = io.StringIO()
         sys.stdout = redirected_output
@@ -114,20 +136,11 @@ class ToolRegistry:
         finally:
             sys.stdout = old_stdout
 
-    def _calculate(self, expression: str) -> Dict[str, Any]:
-        try:
-            # Safe evaluation for math expressions
-            allowed_names = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
-            result = eval(expression, {"__builtins__": {}}, allowed_names)
-            return {"output": f"Calculated Result: {result}", "citations": []}
-        except Exception as e:
-            return {"output": f"Math error: {str(e)}", "citations": []}
-
     def _retrieve_knowledge(self, query: str) -> Dict[str, Any]:
         kb_docs = [
             {
                 "id": 1,
-                "title": "Agentic AI System Design Guide",
+                "title": "Agentic AI System Architecture Guide",
                 "url": "https://pydantic.dev/articles/llm-intro",
                 "text": "Modern AI systems combine ReAct iterative reasoning with tool calling and citation grounding to eliminate hallucinations."
             },

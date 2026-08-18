@@ -1,11 +1,11 @@
 /**
- * OmniAgent Studio Complete Application Controller & Sound FX Engine
+ * OmniAgent Studio Complete Application Controller & In-Place Swarm Execution
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
+let currentActiveSection = 'chat';
 
-// Native Web Audio Synthesizer (Zero External Files Required)
 function playCyberSound(type) {
     if (!soundEnabled) return;
     try {
@@ -100,18 +100,25 @@ function updateAgentStatus(text, active) {
     }
 }
 
-function updateSwarmStatus(activeAgent) {
+function updateSwarmStatus(activeAgent, stepContent) {
     ['scout', 'compute', 'critic'].forEach(agent => {
         const card = document.getElementById(`agent-card-${agent}`);
         if (!card) return;
         const badge = card.querySelector('.badge-status-text');
+        const descElem = card.querySelector('p');
+        
         if (agent === activeAgent) {
             card.style.borderColor = '#ffffff';
-            card.style.background = 'rgba(205, 0, 41, 0.4)';
+            card.style.background = 'rgba(205, 0, 41, 0.45)';
+            card.style.boxShadow = '0 0 30px rgba(205, 0, 41, 0.7)';
             if (badge) { badge.textContent = 'Active & Processing ⚡'; badge.style.color = '#fff'; }
+            if (stepContent && descElem) {
+                descElem.innerHTML = `<span style="color:#ffffff; font-weight:600;">${stepContent.substring(0, 160)}...</span>`;
+            }
         } else {
             card.style.borderColor = 'rgba(205, 0, 41, 0.55)';
             card.style.background = 'rgba(32, 6, 13, 0.8)';
+            card.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4)';
             if (badge) { badge.textContent = 'Standby'; badge.style.color = '#cbd5e1'; }
         }
     });
@@ -127,8 +134,8 @@ function handleAgentMessage(data) {
         if (costElem) costElem.textContent = `$${data.metrics.estimated_cost_usd.toFixed(6)}`;
     }
 
-    if (data.active_agent) {
-        updateSwarmStatus(data.active_agent);
+    if (data.active_agent && data.step) {
+        updateSwarmStatus(data.active_agent, data.step.content);
     }
 
     if (data.step) {
@@ -143,7 +150,6 @@ function handleAgentMessage(data) {
     if (data.completed) {
         playCyberSound('complete');
         updateAgentStatus('Core: Ready', false);
-        updateSwarmStatus(null);
     }
 }
 
@@ -230,18 +236,19 @@ function sendUserPrompt() {
     const prompt = input.value.trim();
     if (!prompt || !socket || socket.readyState !== WebSocket.OPEN) return;
 
-    showSection('chat');
-
+    // Append to Chat canvas
     const canvas = document.getElementById('chat-section');
-    const userCard = document.createElement('div');
-    userCard.className = 'step-card';
-    userCard.style.borderLeft = '6px solid #ffffff';
-    userCard.innerHTML = `
-        <div class="step-header"><span class="step-title">👤 User Request</span></div>
-        <div class="step-content">${prompt}</div>
-    `;
-    canvas.appendChild(userCard);
-    canvas.scrollTop = canvas.scrollHeight;
+    if (canvas) {
+        const userCard = document.createElement('div');
+        userCard.className = 'step-card';
+        userCard.style.borderLeft = '6px solid #ffffff';
+        userCard.innerHTML = `
+            <div class="step-header"><span class="step-title">👤 User Request</span></div>
+            <div class="step-content">${prompt}</div>
+        `;
+        canvas.appendChild(userCard);
+        canvas.scrollTop = canvas.scrollHeight;
+    }
 
     updateAgentStatus('Core: Thinking & Executing...', true);
     playCyberSound('send');
@@ -250,8 +257,9 @@ function sendUserPrompt() {
     input.value = '';
 }
 
-// Seamless View Switching
+// Seamless View Switching without jumping
 window.showSection = function(section) {
+    currentActiveSection = section;
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
@@ -268,7 +276,7 @@ window.showSection = function(section) {
         document.getElementById('nav-swarm').classList.add('active');
         document.getElementById('view-title').textContent = 'Autonomous Sub-Agent Swarm';
         document.getElementById('view-subtitle').textContent = 'Live coordination across specialized agents';
-        if (inputDock) inputDock.style.display = 'none';
+        if (inputDock) inputDock.style.display = 'block'; // Keep input bar accessible in Swarm!
     } else if (section === 'tools') {
         document.getElementById('tools-section').style.display = 'flex';
         document.getElementById('nav-tools').classList.add('active');
