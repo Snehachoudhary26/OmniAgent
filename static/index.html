@@ -25,7 +25,6 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span>Agent Swarm</span>
                 </li>
-                <!-- ➕ Add-On 2: Code Sandbox Tab -->
                 <li class="nav-item" id="nav-code" onclick="showSection('code')">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                     <span>Code Sandbox</span>
@@ -94,7 +93,7 @@
                     <div class="step-header">
                         <span class="step-title">⚡ Welcome to OmniAgent Studio</span>
                     </div>
-                    <div class="step-content">I break down complex requirements into autonomous goals, invoke live tools (DuckDuckGo Search, Python Sandbox, Math), and pause for your authorization on critical actions.</div>
+                    <div class="step-content">I break down complex requirements into autonomous goals, invoke live tools (DuckDuckGo Search, Deep URL Scraper, Python Sandbox, Math), and pause for your authorization on critical actions.</div>
                     
                     <!-- Quick Starter Prompts -->
                     <div class="quick-prompts-grid">
@@ -102,13 +101,13 @@
                             <span class="prompt-title">🌐 Live Web Search</span>
                             <span class="prompt-desc">Query DuckDuckGo & get verified citations.</span>
                         </div>
+                        <div class="prompt-chip" onclick="quickRun('Research url: https://pydantic.dev/articles/llm-intro')">
+                            <span class="prompt-title">🔗 Deep URL Researcher</span>
+                            <span class="prompt-desc">Scrape live article text with verified sources.</span>
+                        </div>
                         <div class="prompt-chip" onclick="quickRun('Run python code to calculate squares of numbers')">
                             <span class="prompt-title">🐍 Python Code Sandbox</span>
                             <span class="prompt-desc">Trigger Human-in-the-Loop authorization.</span>
-                        </div>
-                        <div class="prompt-chip" onclick="quickRun('Calculate math: sqrt(625) * 14 + (2 ** 8) / 4')">
-                            <span class="prompt-title">⚡ Precision Calculator</span>
-                            <span class="prompt-desc">Evaluate complex mathematical formulas.</span>
                         </div>
                         <div class="prompt-chip" onclick="quickRun('What are the architectural capabilities of OmniAgent?')">
                             <span class="prompt-title">🧠 Long-Term Memory Recall</span>
@@ -158,7 +157,7 @@
                 </div>
             </div>
 
-            <!-- ➕ Add-On 2: Code Sandbox Interactive View -->
+            <!-- 3. Code Sandbox Interactive View -->
             <div class="code-canvas view-section" id="code-section" style="display:none;">
                 <div class="tools-header-banner">
                     <h2>🐍 Interactive Python Sandbox & REPL</h2>
@@ -206,7 +205,7 @@ print(compute_squares(10))"></textarea>
                 </div>
             </div>
 
-            <!-- 3. Multi-Tools Registry View -->
+            <!-- 4. Multi-Tools Registry View -->
             <div class="tools-canvas view-section" id="tools-section" style="display:none;">
                 <div class="tools-header-banner">
                     <h2>🛠️ Active Dynamic Tool Registry</h2>
@@ -215,15 +214,23 @@ print(compute_squares(10))"></textarea>
                 <div class="tools-grid" id="tools-grid-list"></div>
             </div>
 
-            <!-- 4. Vector Vault Memory View -->
+            <!-- 5. Vector Vault Memory View -->
             <div class="memory-canvas view-section" id="memory-section" style="display:none;">
                 <div class="memory-header-banner">
                     <h2>🧠 Long-Term Semantic Vector Vault</h2>
-                    <p>Persistent facts and knowledge recalled during ReAct reasoning.</p>
+                    <p>Persistent facts and document knowledge recalled during ReAct reasoning.</p>
+                </div>
+
+                <!-- ➕ Add-On 4: File Drag-and-Drop Dropzone -->
+                <div class="dropzone-card" id="vault-dropzone" onclick="document.getElementById('vault-file-input').click()">
+                    <input type="file" id="vault-file-input" style="display:none;" accept=".txt,.md,.json,.csv,.py,.pdf" onchange="handleFileUpload(event)">
+                    <div class="dropzone-icon">📂</div>
+                    <div class="dropzone-title">Drag & Drop Documents Here to Index Knowledge</div>
+                    <div class="dropzone-subtitle">Supports <code>.txt</code>, <code>.md</code>, <code>.json</code>, <code>.csv</code>, <code>.py</code> • Auto-Chunked & Vector Indexed</div>
                 </div>
                 
                 <div class="memory-input-card">
-                    <h3>➕ Store New Fact to Agent Memory</h3>
+                    <h3>➕ Store New Fact Manually</h3>
                     <div class="memory-form">
                         <input type="text" id="mem-new-tag" placeholder="Tag (e.g. UserGoal, Preference)..." class="mem-input-tag">
                         <input type="text" id="mem-new-text" placeholder="Fact content to store in long-term memory..." class="mem-input-text">
@@ -277,7 +284,7 @@ print(compute_squares(10))"></textarea>
             <div class="memory-chip-list" id="memory-chip-list">
                 <div class="memory-chip">📌 Architecture: Hybrid ReAct Planner</div>
                 <div class="memory-chip">📌 Safety: Human Approval Gateway Active</div>
-                <div class="memory-chip">📌 Tools: Web Search, Python Sandbox, Math</div>
+                <div class="memory-chip">📌 Tools: Web Search, Deep URL Scraper, Python Sandbox, Math</div>
             </div>
         </aside>
     </div>

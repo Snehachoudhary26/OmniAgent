@@ -1,7 +1,8 @@
 import os
 import json
 import time
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+import re
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.agent.schemas import QueryRequest, ApprovalDecision
@@ -52,16 +53,38 @@ async def add_memory(payload: dict):
     res = agent_engine.memory_vault.store_fact(text, tag)
     return {"status": "saved", "message": res}
 
-@app.post("/api/approve")
-async def process_approval(decision: ApprovalDecision):
-    results = agent_engine.resume_approved_task(
-        task_id=decision.task_id,
-        approved=decision.approved,
-        feedback=decision.feedback
-    )
-    return {"status": "processed", "steps": results}
+# ➕ Add-On 4: Document File Upload & Chunk Ingestion Endpoint
+@app.post("/api/memory/upload")
+async def upload_document_memory(file: UploadFile = File(...)):
+    try:
+        content_bytes = await file.read()
+        text_content = content_bytes.decode("utf-8", errors="ignore").strip()
+        
+        if not text_content:
+            raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
-# ➕ Add-On 2: Interactive Live Code Execution Endpoint
+        # Chunk text into clean semantic paragraphs
+        raw_chunks = [c.strip() for c in re.split(r'\n\s*\n', text_content) if len(c.strip()) > 15]
+        if not raw_chunks:
+            raw_chunks = [text_content[:300]]
+
+        clean_filename = file.filename if file.filename else "Document"
+        tag_name = f"Doc:{clean_filename[:20]}"
+        
+        saved_count = 0
+        for chunk in raw_chunks[:8]:  # Index top chunks
+            agent_engine.memory_vault.store_fact(chunk, tag=tag_name)
+            saved_count += 1
+
+        return {
+            "status": "indexed",
+            "filename": clean_filename,
+            "chunks_indexed": saved_count
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process document: {str(e)}")
+
+# ➕ Live Python Code Sandbox Endpoint
 @app.post("/api/code/run")
 async def run_live_code(payload: dict):
     code = payload.get("code", "")
@@ -77,6 +100,15 @@ async def run_live_code(payload: dict):
         "execution_ms": exec_time,
         "status": "success" if "Exception" not in result.get("output", "") else "error"
     }
+
+@app.post("/api/approve")
+async def process_approval(decision: ApprovalDecision):
+    results = agent_engine.resume_approved_task(
+        task_id=decision.task_id,
+        approved=decision.approved,
+        feedback=decision.feedback
+    )
+    return {"status": "processed", "steps": results}
 
 @app.websocket("/ws/agent")
 async def websocket_agent_endpoint(websocket: WebSocket):

@@ -114,10 +114,16 @@ body.light-theme .memory-input-card,
 body.light-theme .memory-chip,
 body.light-theme .agent-status-badge,
 body.light-theme .code-editor-card,
-body.light-theme .code-output-card {
+body.light-theme .code-output-card,
+body.light-theme .dropzone-card {
     background: rgba(255, 255, 255, 0.95) !important;
     border-color: rgba(205, 0, 41, 0.4) !important;
     box-shadow: 0 6px 24px rgba(205, 0, 41, 0.1) !important;
+}
+
+body.light-theme .dropzone-card {
+    border: 2px dashed rgba(205, 0, 41, 0.5) !important;
+    background: rgba(255, 245, 247, 0.8) !important;
 }
 
 body.light-theme .code-textarea {
@@ -160,7 +166,8 @@ body.light-theme .memory-header-banner h2,
 body.light-theme .memory-input-card h3,
 body.light-theme .swarm-info h3,
 body.light-theme .vault-tag,
-body.light-theme .code-output-header span {
+body.light-theme .code-output-header span,
+body.light-theme .dropzone-title {
     color: #0f172a !important;
 }
 
@@ -172,7 +179,8 @@ body.light-theme .metric-label,
 body.light-theme .header-subtitle,
 body.light-theme .swarm-info p,
 body.light-theme .tools-header-banner p,
-body.light-theme .memory-header-banner p {
+body.light-theme .memory-header-banner p,
+body.light-theme .dropzone-subtitle {
     color: #334155 !important;
 }
 
@@ -619,7 +627,54 @@ body.light-theme .switch-knob {
     border-radius: 10px;
 }
 
-/* ➕ Add-On 2: Interactive Code Editor Styles */
+/* ➕ Add-On 4: Vector Vault Dropzone */
+.dropzone-card {
+    background: var(--surface-card);
+    border: 2px dashed var(--cherry-border);
+    border-radius: 18px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 0.25s ease;
+}
+
+.dropzone-card:hover, .dropzone-card.dragover {
+    border-color: var(--cherry-red);
+    background: rgba(205, 0, 41, 0.15);
+    box-shadow: 0 0 28px rgba(205, 0, 41, 0.4);
+    transform: scale(1.01);
+}
+
+.dropzone-icon {
+    font-size: 2.2rem;
+}
+
+.dropzone-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.dropzone-subtitle {
+    font-size: 0.82rem;
+    color: var(--white-subtle);
+}
+
+.dropzone-subtitle code {
+    background: var(--input-bg);
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--cherry-border);
+}
+
+/* Interactive Code Editor Styles */
 .code-editor-card {
     background: var(--surface-card);
     border: 1.5px solid var(--cherry-border);

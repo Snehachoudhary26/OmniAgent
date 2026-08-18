@@ -1,10 +1,70 @@
 /**
- * OmniAgent Studio Complete Controller with Code Sandbox REPL
+ * OmniAgent Studio Complete Controller with Vector Vault Document Ingestion
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+
+// 📂 Document Drag & Drop / Upload Ingestion Handler
+window.handleFileUpload = async function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    await processUploadedDocument(file);
+};
+
+async function processUploadedDocument(file) {
+    playCyberSound('click');
+    showDiagnosticToast(`📂 Reading & Chunking ${file.name}...`);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const res = await fetch('/api/memory/upload', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        
+        if (data.status === 'indexed') {
+            showDiagnosticToast(`✅ ${data.filename} Indexed! (${data.chunks_indexed} Semantic Chunks)`);
+            playCyberSound('complete');
+            loadMemoryVault();
+        } else {
+            alert('Failed to index document.');
+        }
+    } catch (e) {
+        showDiagnosticToast('⚠️ Upload Error: Could not parse document.');
+    }
+}
+
+function initDropzoneEvents() {
+    const dropzone = document.getElementById('vault-dropzone');
+    if (!dropzone) return;
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('dragover');
+        });
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const file = dt.files[0];
+        if (file) processUploadedDocument(file);
+    });
+}
 
 // 🐍 Code Sandbox Templates & Execution Controller
 const CODE_TEMPLATES = {
@@ -113,7 +173,6 @@ window.executeSandboxCode = async function() {
         if (latBadge) latBadge.textContent = `Latency: ${data.execution_ms} ms`;
 
         playCyberSound('complete');
-        if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
     } catch (e) {
         if (consoleOut) {
             consoleOut.textContent = `Sandbox Error: ${e.message}`;
@@ -205,8 +264,6 @@ window.exportSession = function(format) {
         downloadFile(`omniagent_telemetry_${timestamp}.json`, JSON.stringify(telemetry, null, 2), 'application/json');
         showDiagnosticToast('📊 Structured JSON Telemetry Exported!');
     }
-
-    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
 };
 
 function downloadFile(filename, text, type) {
@@ -230,20 +287,20 @@ window.clearSession = function() {
             <div class="step-header">
                 <span class="step-title">⚡ Welcome to OmniAgent Studio</span>
             </div>
-            <div class="step-content">I break down complex requirements into autonomous goals, invoke live tools (DuckDuckGo Search, Python Sandbox, Math), and pause for your authorization on critical actions.</div>
+            <div class="step-content">I break down complex requirements into autonomous goals, invoke live tools (DuckDuckGo Search, Deep URL Scraper, Python Sandbox, Math), and pause for your authorization on critical actions.</div>
             
             <div class="quick-prompts-grid">
                 <div class="prompt-chip" onclick="quickRun('Search latest trends in quantum computing')">
                     <span class="prompt-title">🌐 Live Web Search</span>
                     <span class="prompt-desc">Query DuckDuckGo & get verified citations.</span>
                 </div>
+                <div class="prompt-chip" onclick="quickRun('Research url: https://pydantic.dev/articles/llm-intro')">
+                    <span class="prompt-title">🔗 Deep URL Researcher</span>
+                    <span class="prompt-desc">Scrape live article text with verified sources.</span>
+                </div>
                 <div class="prompt-chip" onclick="quickRun('Run python code to calculate squares of numbers')">
                     <span class="prompt-title">🐍 Python Code Sandbox</span>
                     <span class="prompt-desc">Trigger Human-in-the-Loop authorization.</span>
-                </div>
-                <div class="prompt-chip" onclick="quickRun('Calculate math: sqrt(625) * 14 + (2 ** 8) / 4')">
-                    <span class="prompt-title">⚡ Precision Calculator</span>
-                    <span class="prompt-desc">Evaluate complex mathematical formulas.</span>
                 </div>
                 <div class="prompt-chip" onclick="quickRun('What are the architectural capabilities of OmniAgent?')">
                     <span class="prompt-title">🧠 Long-Term Memory Recall</span>
@@ -258,7 +315,6 @@ window.clearSession = function() {
     document.getElementById('metric-cost').textContent = '$0.000000';
 
     showDiagnosticToast('🗑️ Session History Cleared & Reset!');
-    if (window.orbitalBg) window.orbitalBg.firePartyPopper('center');
 };
 
 // ⚡ Live System Diagnostics on "Core: Ready" Click
@@ -281,7 +337,7 @@ window.runDiagnostics = async function() {
         }
         if (text) text.textContent = 'Core: 100% OK';
 
-        showDiagnosticToast(`⚡ Diagnostic Passed • Latency: ${lat}ms • Tools Active: ${data.tools_count || 4} • Memory Synced`);
+        showDiagnosticToast(`⚡ Diagnostic Passed • Latency: ${lat}ms • Tools Active: ${data.tools_count || 5} • Memory Synced`);
         playCyberSound('complete');
 
         setTimeout(() => {
@@ -422,7 +478,6 @@ window.toggleTheme = function() {
     localStorage.setItem('omni_theme', currentTheme);
     applyTheme(currentTheme);
     playCyberSound('click');
-    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
 };
 
 function applyTheme(theme) {
@@ -533,7 +588,6 @@ function handleAgentMessage(data) {
     if (data.completed) {
         playCyberSound('complete');
         updateAgentStatus('Core: Ready', false);
-        if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
     }
 }
 
@@ -587,7 +641,6 @@ function renderStepCard(step, taskId, awaitingApproval) {
 
 window.sendApproval = async function(taskId, approved) {
     playCyberSound('click');
-    if (window.orbitalBg) window.orbitalBg.firePartyPopper('center');
     const box = document.getElementById(`approval-box-${taskId}`);
     if (box) box.innerHTML = `<span style="font-size:0.9rem; color:var(--text-main);">Processing decision (${approved ? 'Approved' : 'Rejected'})...</span>`;
 
@@ -603,7 +656,6 @@ window.sendApproval = async function(taskId, approved) {
         }
         updateAgentStatus('Core: Ready', false);
         playCyberSound('complete');
-        if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
     } catch (e) {
         console.error(e);
     }
@@ -611,7 +663,6 @@ window.sendApproval = async function(taskId, approved) {
 
 window.quickRun = function(promptText) {
     playCyberSound('click');
-    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
     showSection('chat');
     const input = document.getElementById('user-input');
     if (!input) return;
@@ -624,8 +675,6 @@ function sendUserPrompt() {
     if (!input) return;
     const prompt = input.value.trim();
     if (!prompt || !socket || socket.readyState !== WebSocket.OPEN) return;
-
-    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
 
     const canvas = document.getElementById('chat-section');
     if (canvas) {
@@ -647,7 +696,7 @@ function sendUserPrompt() {
     input.value = '';
 }
 
-// 🔀 Active Tab Router with Code Sandbox
+// 🔀 Active Tab Router
 window.showSection = function(section) {
     playCyberSound('click');
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
@@ -690,6 +739,7 @@ window.showSection = function(section) {
         document.getElementById('view-subtitle').textContent = 'Persistent cross-session knowledge & facts';
         if (inputDock) inputDock.style.display = 'none';
         loadMemoryVault();
+        initDropzoneEvents();
     }
 };
 
@@ -740,7 +790,6 @@ async function loadMemoryVault() {
 
 window.saveNewMemory = async function() {
     playCyberSound('click');
-    if (window.orbitalBg) window.orbitalBg.firePartyPopper('center');
     const tag = document.getElementById('mem-new-tag').value.trim() || 'CustomFact';
     const text = document.getElementById('mem-new-text').value.trim();
     if (!text) return alert('Please enter fact text.');
