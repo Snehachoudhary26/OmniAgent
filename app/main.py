@@ -22,6 +22,11 @@ agent_engine = ReActAgentEngine()
 static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+# 🌟 Browser Tab URL Favicon Endpoint
+@app.get("/favicon.ico", include_in_schema=False)
+async def get_favicon_ico():
+    return FileResponse(os.path.join(static_dir, "favicon.png"))
+
 @app.get("/")
 async def get_index():
     index_path = os.path.join(static_dir, "index.html")
