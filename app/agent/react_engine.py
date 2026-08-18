@@ -1,6 +1,7 @@
 import time
 import json
 import uuid
+import re
 import urllib.request
 import urllib.error
 from typing import Dict, Any, List, Optional, AsyncGenerator
@@ -32,7 +33,6 @@ class ReActAgentEngine:
         # 1. Goal Definition & Memory Recall (Scout Agent)
         self.memory_vault.add_short_term("user", prompt)
         recalled_mem = self.memory_vault.recall_relevant(prompt, top_k=2)
-        mem_context = "; ".join([m["text"] for m in recalled_mem])
 
         goal_step = AgentStep(
             step_number=step_counter,
@@ -55,7 +55,12 @@ class ReActAgentEngine:
         selected_tool = None
         tool_args = {}
 
-        if any(w in lower_prompt for w in ["calculate", "math", "+", "-", "*", "/", "sqrt", "sin"]):
+        # 🌐 1. Check for URL Research
+        url_match = re.search(r'https?://[^\s,]+', prompt)
+        if url_match or any(w in lower_prompt for w in ["scrape", "summarize url", "research url", "read link", "inspect link"]):
+            selected_tool = "deep_url_researcher"
+            tool_args = {"url": url_match.group(0) if url_match else prompt}
+        elif any(w in lower_prompt for w in ["calculate", "math", "+", "-", "*", "/", "sqrt", "sin"]):
             selected_tool = "math_calculator"
             expr = prompt.replace("calculate", "").replace("what is", "").replace("solve", "").strip()
             tool_args = {"expression": expr if expr else "2 * math.pi * 5"}
