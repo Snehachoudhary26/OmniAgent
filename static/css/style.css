@@ -7,7 +7,7 @@
     --white-muted: #f1f5f9;
     --white-subtle: #cbd5e1;
     --bg-dark: #050102;
-    --surface-glass: rgba(14, 2, 6, 0.85);
+    --surface-glass: rgba(14, 2, 6, 0.35);
     --surface-card: rgba(16, 3, 7, 0.92);
     --border-glass: rgba(205, 0, 41, 0.5);
     --text-main: #ffffff;
@@ -17,10 +17,10 @@
     --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* ☀️ Crisp Pure White + Vivid Cherry Red Light Mode */
+/* ☀️ Crisp Pure White Light Mode */
 body.light-theme {
     --bg-dark: #ffffff;
-    --surface-glass: rgba(255, 255, 255, 0.88);
+    --surface-glass: rgba(255, 255, 255, 0.35);
     --surface-card: rgba(255, 255, 255, 0.94);
     --border-glass: rgba(205, 0, 41, 0.45);
     --cherry-border: rgba(205, 0, 41, 0.55);
@@ -38,11 +38,7 @@ body.light-theme {
 body.light-theme .sidebar-nav,
 body.light-theme .workspace-header,
 body.light-theme .metrics-panel,
-body.light-theme .input-dock {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border-color: rgba(205, 0, 41, 0.4) !important;
-}
-
+body.light-theme .input-dock,
 body.light-theme .main-workspace {
     background: transparent !important;
     border-color: rgba(205, 0, 41, 0.4) !important;
@@ -61,7 +57,7 @@ body.light-theme .memory-chip,
 body.light-theme .agent-status-badge {
     background: rgba(255, 255, 255, 0.94) !important;
     border-color: rgba(205, 0, 41, 0.45) !important;
-    box-shadow: 0 6px 24px rgba(205, 0, 41, 0.12) !important;
+    box-shadow: 0 6px 24px rgba(205, 0, 41, 0.15) !important;
 }
 
 body.light-theme .step-title,
@@ -136,26 +132,24 @@ body {
     pointer-events: all;
 }
 
-/* 3-Column Layout */
+/* 3-Column Layout (Full Screen Transparency to reveal continuous 3D Galaxy) */
 .app-container {
     position: relative;
     z-index: 10;
     display: grid;
     grid-template-columns: 280px 1fr 340px;
     height: 100vh;
+    background: transparent;
 }
 
-/* Left Sidebar */
+/* Left Sidebar (Fully Transparent Container) */
 .sidebar-nav {
-    background: var(--surface-glass);
+    background: transparent;
     border-right: 1.5px solid var(--cherry-border);
     display: flex;
     flex-direction: column;
     padding: 24px 20px;
     gap: 24px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
 }
 
 .omni-brand-core {
@@ -253,15 +247,17 @@ body {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.25s ease;
-    border: 1.5px solid transparent;
-    background: rgba(205, 0, 41, 0.12);
+    border: 1.5px solid rgba(205, 0, 41, 0.3);
+    background: rgba(14, 2, 6, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .nav-item:hover, .nav-item.active {
     color: var(--white);
-    background: rgba(205, 0, 41, 0.35);
+    background: rgba(205, 0, 41, 0.4);
     border-color: var(--cherry-red);
-    box-shadow: 0 0 20px rgba(205, 0, 41, 0.5);
+    box-shadow: 0 0 24px rgba(205, 0, 41, 0.5);
     transform: translateX(4px);
 }
 
@@ -275,12 +271,14 @@ body {
 .agent-status-badge {
     margin-top: auto;
     padding: 16px;
-    background: var(--surface-card);
+    background: rgba(14, 2, 6, 0.85);
     border: 1.5px solid var(--cherry-border);
     border-radius: 16px;
     display: flex;
     align-items: center;
     gap: 14px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 0 20px rgba(205, 0, 41, 0.3);
     cursor: pointer;
     transition: all 0.25s ease;
@@ -323,9 +321,7 @@ body {
     justify-content: space-between;
     padding: 18px 28px;
     border-bottom: 1.5px solid var(--cherry-border);
-    background: var(--surface-glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: transparent;
     flex-shrink: 0;
 }
 
@@ -419,7 +415,7 @@ body.light-theme .switch-knob {
 }
 
 .btn-sound-toggle {
-    background: rgba(205, 0, 41, 0.18);
+    background: rgba(14, 2, 6, 0.85);
     color: var(--text-main);
     border: 1.5px solid var(--cherry-red);
     padding: 8px 16px;
@@ -437,7 +433,6 @@ body.light-theme .switch-knob {
     transform: scale(1.05);
 }
 
-/* 🏷️ Clean High-Contrast Pill (White text on dark obsidian pill) */
 .model-pill {
     font-size: 0.8rem;
     font-weight: 800;
@@ -730,7 +725,7 @@ body.light-theme .switch-knob {
     color: var(--white-subtle);
 }
 
-/* 🛡️ Frosted Obsidian Shield Step Cards (100% Readable Text) */
+/* 🛡️ Frosted Obsidian Shield Step Cards */
 .step-card {
     background: var(--surface-card);
     border: 1.5px solid var(--border-glass);
@@ -840,10 +835,8 @@ body.light-theme .switch-knob {
 /* Input Dock */
 .input-dock {
     padding: 18px 28px;
-    background: var(--surface-glass);
+    background: transparent;
     border-top: 1.5px solid var(--cherry-border);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     flex-shrink: 0;
 }
 
@@ -855,6 +848,8 @@ body.light-theme .switch-knob {
     border-radius: 18px;
     padding: 10px 18px;
     gap: 14px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 0 20px rgba(205, 0, 41, 0.3);
     transition: all 0.25s ease;
 }
@@ -895,18 +890,15 @@ body.light-theme .switch-knob {
     transform: scale(1.1);
 }
 
-/* Right Observability Panel */
+/* Right Observability Panel (Fully Transparent Container) */
 .metrics-panel {
-    background: var(--surface-glass);
+    background: transparent;
     border-left: 1.5px solid var(--cherry-border);
     padding: 24px 20px;
     display: flex;
     flex-direction: column;
     gap: 22px;
     overflow-y: auto;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
 }
 
 .panel-section-title {
@@ -995,6 +987,8 @@ body.light-theme .switch-knob {
     background: var(--surface-card);
     border: 1.5px solid var(--cherry-border);
     border-radius: 12px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     color: var(--white-muted);
     line-height: 1.45;
 }
