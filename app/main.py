@@ -31,6 +31,11 @@ async def get_login():
     login_path = os.path.join(static_dir, "login.html")
     return FileResponse(login_path)
 
+@app.get("/signup")
+async def get_signup():
+    signup_path = os.path.join(static_dir, "signup.html")
+    return FileResponse(signup_path)
+
 @app.get("/api/health")
 async def health_check():
     return {

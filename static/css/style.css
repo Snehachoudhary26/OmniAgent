@@ -259,10 +259,29 @@ body {
     gap: 24px;
 }
 
+/* 🛡️ Protected Top-Left Logo Blur Shield (No orbital line collision!) */
 .omni-brand-core {
     display: flex;
     align-items: center;
     gap: 16px;
+    background: rgba(14, 2, 6, 0.94);
+    border: 1.5px solid var(--cherry-border);
+    border-radius: 18px;
+    padding: 12px 16px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease;
+}
+
+body.light-theme .omni-brand-core {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgba(205, 0, 41, 0.4) !important;
+    box-shadow: 0 4px 20px rgba(205, 0, 41, 0.12) !important;
+}
+
+.omni-brand-core:hover {
+    transform: scale(1.02);
 }
 
 .gyro-logo-wrapper {
@@ -274,10 +293,6 @@ body {
     justify-content: center;
     filter: drop-shadow(0 0 16px var(--cherry-glow));
     transition: transform 0.3s ease;
-}
-
-.gyro-logo-wrapper:hover {
-    transform: scale(1.1) rotate(15deg);
 }
 
 .spin-slow-cw {
@@ -374,27 +389,119 @@ body {
     color: var(--cherry-red);
 }
 
-/* ⚡ Interactive Diagnostic Badge */
-.agent-status-badge {
+/* 👤 Bottom Left Account Popover Badge */
+.account-gateway-wrapper {
     margin-top: auto;
-    padding: 16px;
-    background: rgba(14, 2, 6, 0.88);
+    position: relative;
+}
+
+.account-badge {
+    background: rgba(14, 2, 6, 0.92);
+    border: 1.5px solid var(--cherry-border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 0 20px rgba(205, 0, 41, 0.3);
+    transition: all 0.25s ease;
+}
+
+body.light-theme .account-badge {
+    background: #ffffff !important;
+    border-color: rgba(205, 0, 41, 0.4) !important;
+}
+
+.account-badge:hover {
+    border-color: var(--cherry-red);
+    box-shadow: 0 0 24px var(--cherry-glow);
+    transform: translateY(-2px);
+}
+
+.account-svg-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--cherry-red);
+}
+
+.account-chevron {
+    margin-left: auto;
+    font-size: 0.9rem;
+    color: var(--white-subtle);
+}
+
+.account-popover-menu {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    width: 100%;
+    background: rgba(14, 2, 6, 0.96);
+    border: 1.5px solid var(--cherry-red);
+    border-radius: 16px;
+    padding: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.8), 0 0 24px rgba(205, 0, 41, 0.4);
+    z-index: 100;
+}
+
+body.light-theme .account-popover-menu {
+    background: #ffffff !important;
+    border-color: rgba(205, 0, 41, 0.5) !important;
+    box-shadow: 0 10px 30px rgba(205, 0, 41, 0.2) !important;
+}
+
+.account-popover-menu.show {
+    display: flex;
+}
+
+.account-popover-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.account-popover-item svg {
+    color: var(--cherry-red);
+}
+
+.account-popover-item:hover {
+    background: var(--cherry-subtle);
+    color: var(--cherry-glow);
+    transform: translateX(4px);
+}
+
+/* ⚡ Core: Ready Status Badge in Right Panel */
+.panel-bottom-status {
+    margin-top: auto;
+    padding: 14px 18px;
+    background: var(--surface-card);
     border: 1.5px solid var(--cherry-border);
     border-radius: 16px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 0 20px rgba(205, 0, 41, 0.3);
     cursor: pointer;
     transition: all 0.25s ease;
 }
 
-.agent-status-badge:hover {
-    border-color: var(--white);
-    transform: scale(1.03);
+.panel-bottom-status:hover {
+    border-color: var(--cherry-red);
     box-shadow: 0 0 24px var(--cherry-glow);
+    transform: scale(1.02);
 }
 
 .status-dot {
@@ -422,7 +529,7 @@ body {
     position: relative;
 }
 
-/* 🛡️ Header Shield */
+/* Header Shield */
 .workspace-header {
     display: flex;
     align-items: center;
@@ -517,7 +624,7 @@ body {
     color: var(--cherry-glow);
 }
 
-/* 🌟 Luxury 3D Animated Slider */
+/* Luxury 3D Animated Slider */
 .theme-switch-btn {
     position: relative;
     width: 155px;
@@ -638,7 +745,7 @@ body.light-theme .switch-knob {
     border-radius: 10px;
 }
 
-/* ➕ Add-On 5: Settings Modal Backdrop */
+/* Settings Modal Backdrop */
 .settings-modal-backdrop {
     position: fixed;
     top: 0;
@@ -1254,7 +1361,7 @@ body.light-theme .switch-knob {
     color: var(--white-subtle);
 }
 
-/* 🛡️ Frosted Obsidian Shield Step Cards */
+/* Frosted Obsidian Shield Step Cards */
 .step-card {
     background: var(--surface-card);
     border: 1.5px solid var(--border-glass);
@@ -1361,7 +1468,7 @@ body.light-theme .switch-knob {
     background: rgba(205, 0, 41, 0.2);
 }
 
-/* 🛡️ Input Dock Frosted Shield */
+/* Input Dock Frosted Shield */
 .input-dock {
     padding: 18px 28px;
     background: rgba(14, 2, 6, 0.92);

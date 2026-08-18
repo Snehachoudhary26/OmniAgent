@@ -1,5 +1,5 @@
 /**
- * OmniAgent Studio Complete Controller with Persona & Reasoning Configuration
+ * OmniAgent Studio Complete Controller
  */
 let socket = null;
 let soundEnabled = true;
@@ -7,6 +7,30 @@ let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
 let activePersona = localStorage.getItem('omni_persona') || 'architect';
 let activeTemperature = parseFloat(localStorage.getItem('omni_temperature') || '0.7');
+
+// 👤 Account Popover Menu Toggle
+window.toggleAccountMenu = function() {
+    playCyberSound('click');
+    const menu = document.getElementById('account-popover');
+    if (menu) menu.classList.toggle('show');
+};
+
+document.addEventListener('click', (e) => {
+    const wrapper = document.querySelector('.account-gateway-wrapper');
+    const menu = document.getElementById('account-popover');
+    if (menu && wrapper && !wrapper.contains(e.target)) {
+        menu.classList.remove('show');
+    }
+});
+
+// Check Logged-in User
+function checkUserSession() {
+    const authText = document.getElementById('sidebar-auth-text');
+    const userName = localStorage.getItem('omni_user_name');
+    if (authText && userName) {
+        authText.textContent = userName;
+    }
+}
 
 // ⚙️ Settings Modal & Persona Controller
 window.toggleSettingsModal = function() {
@@ -563,8 +587,8 @@ function initWebSocket() {
 }
 
 function updateAgentStatus(text, active) {
-    const statusText = document.querySelector('.status-text');
-    const statusDot = document.querySelector('.status-dot');
+    const statusText = document.querySelector('.panel-bottom-status .status-text');
+    const statusDot = document.querySelector('.panel-bottom-status .status-dot');
     if (statusText) statusText.textContent = text;
     if (statusDot) {
         statusDot.style.background = active ? '#ffffff' : '#cd0029';
@@ -852,6 +876,7 @@ window.saveNewMemory = async function() {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme(currentTheme);
     initWebSocket();
+    checkUserSession();
 
     const btnSend = document.getElementById('btn-send');
     const input = document.getElementById('user-input');
