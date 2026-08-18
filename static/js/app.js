@@ -1,7 +1,70 @@
 /**
- * OmniAgent Application Logic - Navigation & Interaction
+ * OmniAgent Studio Complete Application Controller & Sound FX Engine
  */
 let socket = null;
+let soundEnabled = true;
+let audioCtx = null;
+
+// Native Web Audio Synthesizer (Zero External Files Required)
+function playCyberSound(type) {
+    if (!soundEnabled) return;
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'send') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        } else if (type === 'step') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(587.33, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } else if (type === 'alert') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.setValueAtTime(600, now + 0.1);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        } else if (type === 'complete') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.08);
+            osc.frequency.setValueAtTime(783.99, now + 0.16);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+    } catch (e) {}
+}
+
+window.toggleAudio = function() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('btn-sound');
+    if (btn) {
+        btn.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+        btn.style.borderColor = soundEnabled ? '#cd0029' : 'rgba(255,255,255,0.2)';
+    }
+    if (soundEnabled) playCyberSound('send');
+};
 
 function initWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -37,6 +100,23 @@ function updateAgentStatus(text, active) {
     }
 }
 
+function updateSwarmStatus(activeAgent) {
+    ['scout', 'compute', 'critic'].forEach(agent => {
+        const card = document.getElementById(`agent-card-${agent}`);
+        if (!card) return;
+        const badge = card.querySelector('.badge-status-text');
+        if (agent === activeAgent) {
+            card.style.borderColor = '#ffffff';
+            card.style.background = 'rgba(205, 0, 41, 0.4)';
+            if (badge) { badge.textContent = 'Active & Processing ⚡'; badge.style.color = '#fff'; }
+        } else {
+            card.style.borderColor = 'rgba(205, 0, 41, 0.55)';
+            card.style.background = 'rgba(32, 6, 13, 0.8)';
+            if (badge) { badge.textContent = 'Standby'; badge.style.color = '#cbd5e1'; }
+        }
+    });
+}
+
 function handleAgentMessage(data) {
     if (data.metrics) {
         const tokElem = document.getElementById('metric-tokens');
@@ -47,19 +127,30 @@ function handleAgentMessage(data) {
         if (costElem) costElem.textContent = `$${data.metrics.estimated_cost_usd.toFixed(6)}`;
     }
 
+    if (data.active_agent) {
+        updateSwarmStatus(data.active_agent);
+    }
+
     if (data.step) {
+        if (data.awaiting_approval) {
+            playCyberSound('alert');
+        } else {
+            playCyberSound('step');
+        }
         renderStepCard(data.step, data.task_id, data.awaiting_approval);
     }
 
     if (data.completed) {
+        playCyberSound('complete');
         updateAgentStatus('Core: Ready', false);
+        updateSwarmStatus(null);
     }
 }
 
 function renderStepCard(step, taskId, awaitingApproval) {
-    const canvas = document.getElementById('chat-canvas');
+    const canvas = document.getElementById('chat-section');
     if (!canvas) return;
-    
+
     const card = document.createElement('div');
     card.className = `step-card ${step.step_type}`;
 
@@ -69,7 +160,7 @@ function renderStepCard(step, taskId, awaitingApproval) {
             <div class="citation-container">
                 ${step.citations.map(c => `
                     <a href="${c.source_url}" target="_blank" class="citation-chip">
-                        🔗 [${c.id}] ${c.source_title.substring(0, 24)}...
+                        🔗 [${c.id}] ${c.source_title.substring(0, 26)}...
                     </a>
                 `).join('')}
             </div>
@@ -81,7 +172,7 @@ function renderStepCard(step, taskId, awaitingApproval) {
         approvalHtml = `
             <div class="approval-card" id="approval-box-${taskId}">
                 <div class="approval-title">⚠️ Human Authorization Required</div>
-                <p style="font-size: 0.9rem; color: #ffffff;">Permission requested to run tool: <code>${step.tool_name}</code>.</p>
+                <p style="font-size: 0.9rem; color: #ffffff;">The agent is requesting permission to execute tool: <code>${step.tool_name}</code>.</p>
                 <div class="approval-actions">
                     <button class="btn-approve" onclick="sendApproval('${taskId}', true)">Approve & Run</button>
                     <button class="btn-reject" onclick="sendApproval('${taskId}', false)">Reject</button>
@@ -93,7 +184,7 @@ function renderStepCard(step, taskId, awaitingApproval) {
     card.innerHTML = `
         <div class="step-header">
             <span class="step-title">${step.title}</span>
-            <span style="font-size: 0.75rem; color: #cbd5e1; font-family: monospace;">Step #${step.step_number}</span>
+            <span style="font-size: 0.75rem; color: #cbd5e1; font-family: monospace;">${step.timestamp > 0 ? step.timestamp + ' ms' : 'Step #' + step.step_number}</span>
         </div>
         <div class="step-content">${step.content}</div>
         ${citationsHtml}
@@ -119,12 +210,14 @@ window.sendApproval = async function(taskId, approved) {
             resData.steps.forEach(step => renderStepCard(step));
         }
         updateAgentStatus('Core: Ready', false);
+        playCyberSound('complete');
     } catch (e) {
         console.error(e);
     }
 };
 
 window.quickRun = function(promptText) {
+    showSection('chat');
     const input = document.getElementById('user-input');
     if (!input) return;
     input.value = promptText;
@@ -137,24 +230,125 @@ function sendUserPrompt() {
     const prompt = input.value.trim();
     if (!prompt || !socket || socket.readyState !== WebSocket.OPEN) return;
 
-    const canvas = document.getElementById('chat-canvas');
-    if (canvas) {
-        const userCard = document.createElement('div');
-        userCard.className = 'step-card';
-        userCard.style.borderLeft = '6px solid #ffffff';
-        userCard.innerHTML = `
-            <div class="step-header"><span class="step-title">👤 User Request</span></div>
-            <div class="step-content">${prompt}</div>
-        `;
-        canvas.appendChild(userCard);
-        canvas.scrollTop = canvas.scrollHeight;
-    }
+    showSection('chat');
+
+    const canvas = document.getElementById('chat-section');
+    const userCard = document.createElement('div');
+    userCard.className = 'step-card';
+    userCard.style.borderLeft = '6px solid #ffffff';
+    userCard.innerHTML = `
+        <div class="step-header"><span class="step-title">👤 User Request</span></div>
+        <div class="step-content">${prompt}</div>
+    `;
+    canvas.appendChild(userCard);
+    canvas.scrollTop = canvas.scrollHeight;
 
     updateAgentStatus('Core: Thinking & Executing...', true);
+    playCyberSound('send');
 
     socket.send(JSON.stringify({ prompt: prompt }));
     input.value = '';
 }
+
+// Seamless View Switching
+window.showSection = function(section) {
+    document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+    const inputDock = document.querySelector('.input-dock');
+
+    if (section === 'chat') {
+        document.getElementById('chat-section').style.display = 'flex';
+        document.getElementById('nav-chat').classList.add('active');
+        document.getElementById('view-title').textContent = 'Autonomous Reasoning Studio';
+        document.getElementById('view-subtitle').textContent = 'ReAct Planning • Multi-Agent Swarm • Human-in-the-Loop';
+        if (inputDock) inputDock.style.display = 'block';
+    } else if (section === 'swarm') {
+        document.getElementById('swarm-section').style.display = 'flex';
+        document.getElementById('nav-swarm').classList.add('active');
+        document.getElementById('view-title').textContent = 'Autonomous Sub-Agent Swarm';
+        document.getElementById('view-subtitle').textContent = 'Live coordination across specialized agents';
+        if (inputDock) inputDock.style.display = 'none';
+    } else if (section === 'tools') {
+        document.getElementById('tools-section').style.display = 'flex';
+        document.getElementById('nav-tools').classList.add('active');
+        document.getElementById('view-title').textContent = 'Active Dynamic Tool Registry';
+        document.getElementById('view-subtitle').textContent = 'Capability-based tools with schema guardrails';
+        if (inputDock) inputDock.style.display = 'none';
+        loadToolsGrid();
+    } else if (section === 'memory') {
+        document.getElementById('memory-section').style.display = 'flex';
+        document.getElementById('nav-memory').classList.add('active');
+        document.getElementById('view-title').textContent = 'Long-Term Semantic Vector Vault';
+        document.getElementById('view-subtitle').textContent = 'Persistent cross-session knowledge & facts';
+        if (inputDock) inputDock.style.display = 'none';
+        loadMemoryVault();
+    }
+};
+
+async function loadToolsGrid() {
+    const grid = document.getElementById('tools-grid-list');
+    if (!grid) return;
+    grid.innerHTML = '<span style="color:#ffffff;">Loading tool registry...</span>';
+    try {
+        const res = await fetch('/api/tools');
+        const tools = await res.json();
+        grid.innerHTML = Object.values(tools).map(t => `
+            <div class="tool-card-box">
+                <div class="tool-header">
+                    <span class="tool-name">⚡ ${t.name}</span>
+                    <span class="tool-badge ${t.requires_approval ? 'badge-approval' : 'badge-auto'}">
+                        ${t.requires_approval ? '⚠️ Requires Approval' : '✅ Autonomous'}
+                    </span>
+                </div>
+                <p class="tool-desc">${t.description}</p>
+                <button class="btn-test-tool" onclick="quickRun('Test tool: ${t.name}')">Invoke Tool →</button>
+            </div>
+        `).join('');
+    } catch (e) {
+        grid.innerHTML = '<span style="color:#ff1a47;">Failed to load tools.</span>';
+    }
+}
+
+async function loadMemoryVault() {
+    const grid = document.getElementById('vault-items-grid');
+    if (!grid) return;
+    grid.innerHTML = '<span style="color:#ffffff;">Loading memory vault...</span>';
+    try {
+        const res = await fetch('/api/memory');
+        const memories = await res.json();
+        grid.innerHTML = memories.map(m => `
+            <div class="vault-card-box">
+                <div class="vault-header">
+                    <span class="vault-tag">📌 ${m.tag}</span>
+                    <span class="vault-id">${m.id}</span>
+                </div>
+                <div class="vault-text">${m.text}</div>
+            </div>
+        `).join('');
+    } catch (e) {
+        grid.innerHTML = '<span style="color:#ff1a47;">Failed to load memory.</span>';
+    }
+}
+
+window.saveNewMemory = async function() {
+    const tag = document.getElementById('mem-new-tag').value.trim() || 'CustomFact';
+    const text = document.getElementById('mem-new-text').value.trim();
+    if (!text) return alert('Please enter fact text.');
+
+    try {
+        await fetch('/api/memory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tag: tag, text: text })
+        });
+        document.getElementById('mem-new-text').value = '';
+        loadMemoryVault();
+        playCyberSound('complete');
+    } catch (e) {
+        alert('Failed to save memory.');
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     initWebSocket();
