@@ -51,6 +51,22 @@
                 </div>
                 
                 <div class="header-controls">
+                    <!-- ➕ Add-On: Export Trajectory Dropdown -->
+                    <div class="export-dropdown-wrapper">
+                        <button class="btn-action-header" id="btn-export-menu" onclick="toggleExportMenu()" title="Export Session Trajectory">
+                            📥 Export
+                        </button>
+                        <div class="export-menu-dropdown" id="export-dropdown">
+                            <div class="export-opt" onclick="exportSession('md')">📄 Markdown (.md)</div>
+                            <div class="export-opt" onclick="exportSession('json')">📊 Telemetry (.json)</div>
+                        </div>
+                    </div>
+
+                    <!-- ➕ Add-On: Clear Session Button -->
+                    <button class="btn-action-header" id="btn-clear-session" onclick="clearSession()" title="Clear Current Chat Session">
+                        🗑️ Clear
+                    </button>
+
                     <!-- 3D Luxury Slider Switcher -->
                     <button class="theme-switch-btn" id="theme-slider-btn" type="button" onclick="toggleTheme()" title="Toggle Day / Night Mode">
                         <span class="switch-label-night">NIGHT MODE</span>

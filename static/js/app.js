@@ -1,10 +1,135 @@
 /**
- * OmniAgent Studio Complete Controller with Dynamic Tab Highlighting
+ * OmniAgent Studio Complete Controller with Export & Session Manager
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+
+// 📥 Export Session Dropdown Handler
+window.toggleExportMenu = function() {
+    playCyberSound('click');
+    const menu = document.getElementById('export-dropdown');
+    if (menu) menu.classList.toggle('show');
+};
+
+document.addEventListener('click', (e) => {
+    const wrapper = document.querySelector('.export-dropdown-wrapper');
+    const menu = document.getElementById('export-dropdown');
+    if (menu && wrapper && !wrapper.contains(e.target)) {
+        menu.classList.remove('show');
+    }
+});
+
+// 📥 Export Session to Markdown or JSON
+window.exportSession = function(format) {
+    playCyberSound('complete');
+    const menu = document.getElementById('export-dropdown');
+    if (menu) menu.classList.remove('show');
+
+    const canvas = document.getElementById('chat-section');
+    const cards = canvas ? canvas.querySelectorAll('.step-card') : [];
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const tokVal = document.getElementById('metric-tokens')?.textContent || '0';
+    const latVal = document.getElementById('metric-latency')?.textContent || '0 ms';
+    const costVal = document.getElementById('metric-cost')?.textContent || '$0.00';
+
+    if (format === 'md') {
+        let mdContent = `# 🚀 OmniAgent Autonomous Reasoning Trajectory\n\n`;
+        mdContent += `**Export Timestamp:** ${new Date().toLocaleString()}\n`;
+        mdContent += `**Total Tokens:** ${tokVal} | **Real-Time Latency:** ${latVal} | **Estimated Cost:** ${costVal}\n\n`;
+        mdContent += `---\n\n`;
+
+        cards.forEach((card, index) => {
+            const title = card.querySelector('.step-title')?.textContent || `Step #${index + 1}`;
+            const content = card.querySelector('.step-content')?.textContent || '';
+            mdContent += `### ${title}\n\n${content}\n\n`;
+
+            const citations = card.querySelectorAll('.citation-chip');
+            if (citations.length > 0) {
+                mdContent += `**Verified Sources & Citations:**\n`;
+                citations.forEach(c => {
+                    mdContent += `- [${c.textContent.trim()}](${c.getAttribute('href')})\n`;
+                });
+                mdContent += `\n`;
+            }
+            mdContent += `---\n\n`;
+        });
+
+        downloadFile(`omniagent_reasoning_${timestamp}.md`, mdContent, 'text/markdown');
+        showDiagnosticToast('📄 Markdown Reasoning Trajectory Exported!');
+    } else if (format === 'json') {
+        const telemetry = {
+            session_id: `omni_${timestamp}`,
+            exported_at: new Date().toISOString(),
+            metrics: { tokens: tokVal, latency: latVal, cost: costVal },
+            trajectory: []
+        };
+
+        cards.forEach((card, index) => {
+            const title = card.querySelector('.step-title')?.textContent || `Step #${index + 1}`;
+            const content = card.querySelector('.step-content')?.textContent || '';
+            telemetry.trajectory.push({ step: index + 1, title: title, content: content });
+        });
+
+        downloadFile(`omniagent_telemetry_${timestamp}.json`, JSON.stringify(telemetry, null, 2), 'application/json');
+        showDiagnosticToast('📊 Structured JSON Telemetry Exported!');
+    }
+
+    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
+};
+
+function downloadFile(filename, text, type) {
+    const blob = new Blob([text], { type: type });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// 🗑️ Clear Session & Reset Telemetry
+window.clearSession = function() {
+    playCyberSound('click');
+    const canvas = document.getElementById('chat-section');
+    if (!canvas) return;
+
+    canvas.innerHTML = `
+        <div class="step-card goal">
+            <div class="step-header">
+                <span class="step-title">⚡ Welcome to OmniAgent Studio</span>
+            </div>
+            <div class="step-content">I break down complex requirements into autonomous goals, invoke live tools (DuckDuckGo Search, Python Sandbox, Math), and pause for your authorization on critical actions.</div>
+            
+            <div class="quick-prompts-grid">
+                <div class="prompt-chip" onclick="quickRun('Search latest trends in quantum computing')">
+                    <span class="prompt-title">🌐 Live Web Search</span>
+                    <span class="prompt-desc">Query DuckDuckGo & get verified citations.</span>
+                </div>
+                <div class="prompt-chip" onclick="quickRun('Run python code to calculate squares of numbers')">
+                    <span class="prompt-title">🐍 Python Code Sandbox</span>
+                    <span class="prompt-desc">Trigger Human-in-the-Loop authorization.</span>
+                </div>
+                <div class="prompt-chip" onclick="quickRun('Calculate math: sqrt(625) * 14 + (2 ** 8) / 4')">
+                    <span class="prompt-title">⚡ Precision Calculator</span>
+                    <span class="prompt-desc">Evaluate complex mathematical formulas.</span>
+                </div>
+                <div class="prompt-chip" onclick="quickRun('What are the architectural capabilities of OmniAgent?')">
+                    <span class="prompt-title">🧠 Long-Term Memory Recall</span>
+                    <span class="prompt-desc">Retrieve knowledge from the vector vault.</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('metric-tokens').textContent = '0';
+    document.getElementById('metric-latency').textContent = '0 ms';
+    document.getElementById('metric-cost').textContent = '$0.000000';
+
+    showDiagnosticToast('🗑️ Session History Cleared & Reset!');
+    if (window.orbitalBg) window.orbitalBg.firePartyPopper('center');
+};
 
 // ⚡ Live System Diagnostics on "Core: Ready" Click
 window.runDiagnostics = async function() {
@@ -26,7 +151,7 @@ window.runDiagnostics = async function() {
         }
         if (text) text.textContent = 'Core: 100% OK';
 
-        showDiagnosticToast(`⚡ Diagnostic Passed • Latency: ${lat}ms • Tools Active: ${data.tools_count} • Memory Synced`);
+        showDiagnosticToast(`⚡ Diagnostic Passed • Latency: ${lat}ms • Tools Active: ${data.tools_count || 4} • Memory Synced`);
         playCyberSound('complete');
 
         setTimeout(() => {
@@ -392,7 +517,7 @@ function sendUserPrompt() {
     input.value = '';
 }
 
-// 🔀 Active Tab Router: Shifts the Red Highlight to ONLY the clicked button!
+// 🔀 Active Tab Router
 window.showSection = function(section) {
     playCyberSound('click');
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
