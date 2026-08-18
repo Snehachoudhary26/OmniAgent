@@ -50,6 +50,9 @@
                 </div>
                 
                 <div class="header-controls">
+                    <button class="btn-theme-toggle" id="btn-theme" onclick="toggleTheme()" title="Toggle Dark / Light Theme">
+                        ☀️ Light Mode
+                    </button>
                     <button class="btn-sound-toggle" id="btn-sound" onclick="toggleAudio()" title="Toggle Sci-Fi Cyber Sound FX">
                         🔊 Sound: ON
                     </button>
@@ -75,7 +78,7 @@
                             <span class="prompt-title">🐍 Python Code Sandbox</span>
                             <span class="prompt-desc">Trigger Human-in-the-Loop authorization.</span>
                         </div>
-                        <div class="prompt-chip" onclick="quickRun('Calculate math: sqrt(144) * 25 + 100')">
+                        <div class="prompt-chip" onclick="quickRun('Calculate math: sqrt(625) * 14 + (2 ** 8) / 4')">
                             <span class="prompt-title">⚡ Precision Calculator</span>
                             <span class="prompt-desc">Evaluate complex mathematical formulas.</span>
                         </div>
@@ -133,9 +136,7 @@
                     <h2>🛠️ Active Dynamic Tool Registry</h2>
                     <p>Live capability-based execution tools available to the autonomous agent.</p>
                 </div>
-                <div class="tools-grid" id="tools-grid-list">
-                    <!-- Populated dynamically via JS -->
-                </div>
+                <div class="tools-grid" id="tools-grid-list"></div>
             </div>
 
             <!-- 4. Vector Vault Memory View -->
@@ -154,9 +155,7 @@
                     </div>
                 </div>
 
-                <div class="vault-items-grid" id="vault-items-grid">
-                    <!-- Populated dynamically via JS -->
-                </div>
+                <div class="vault-items-grid" id="vault-items-grid"></div>
             </div>
 
             <!-- Input Bar -->

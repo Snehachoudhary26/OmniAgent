@@ -1,10 +1,30 @@
 /**
- * OmniAgent Studio Complete Application Controller & In-Place Swarm Execution
+ * OmniAgent Studio Controller with Dark/Light Theme Switching
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
-let currentActiveSection = 'chat';
+let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+
+// Theme Toggle Function
+window.toggleTheme = function() {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('omni_theme', currentTheme);
+    applyTheme(currentTheme);
+};
+
+function applyTheme(theme) {
+    const btn = document.getElementById('btn-theme');
+    if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        if (btn) btn.textContent = '🌙 Dark Mode';
+        if (window.orbitalBg) window.orbitalBg.setTheme('light');
+    } else {
+        document.body.classList.remove('light-theme');
+        if (btn) btn.textContent = '☀️ Light Mode';
+        if (window.orbitalBg) window.orbitalBg.setTheme('dark');
+    }
+}
 
 function playCyberSound(type) {
     if (!soundEnabled) return;
@@ -61,7 +81,7 @@ window.toggleAudio = function() {
     const btn = document.getElementById('btn-sound');
     if (btn) {
         btn.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
-        btn.style.borderColor = soundEnabled ? '#cd0029' : 'rgba(255,255,255,0.2)';
+        btn.style.borderColor = soundEnabled ? '#cd0029' : 'rgba(205,0,41,0.2)';
     }
     if (soundEnabled) playCyberSound('send');
 };
@@ -108,18 +128,18 @@ function updateSwarmStatus(activeAgent, stepContent) {
         const descElem = card.querySelector('p');
         
         if (agent === activeAgent) {
-            card.style.borderColor = '#ffffff';
-            card.style.background = 'rgba(205, 0, 41, 0.45)';
-            card.style.boxShadow = '0 0 30px rgba(205, 0, 41, 0.7)';
-            if (badge) { badge.textContent = 'Active & Processing ⚡'; badge.style.color = '#fff'; }
+            card.style.borderColor = '#cd0029';
+            card.style.background = 'var(--cherry-subtle)';
+            card.style.boxShadow = '0 0 30px rgba(205, 0, 41, 0.4)';
+            if (badge) { badge.textContent = 'Active & Processing ⚡'; badge.style.color = '#cd0029'; }
             if (stepContent && descElem) {
-                descElem.innerHTML = `<span style="color:#ffffff; font-weight:600;">${stepContent.substring(0, 160)}...</span>`;
+                descElem.innerHTML = `<span style="color:var(--text-main); font-weight:700;">${stepContent.substring(0, 160)}...</span>`;
             }
         } else {
-            card.style.borderColor = 'rgba(205, 0, 41, 0.55)';
-            card.style.background = 'rgba(32, 6, 13, 0.8)';
-            card.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4)';
-            if (badge) { badge.textContent = 'Standby'; badge.style.color = '#cbd5e1'; }
+            card.style.borderColor = 'var(--cherry-border)';
+            card.style.background = 'var(--surface-card)';
+            card.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.1)';
+            if (badge) { badge.textContent = 'Standby'; badge.style.color = 'var(--white-subtle)'; }
         }
     });
 }
@@ -178,7 +198,7 @@ function renderStepCard(step, taskId, awaitingApproval) {
         approvalHtml = `
             <div class="approval-card" id="approval-box-${taskId}">
                 <div class="approval-title">⚠️ Human Authorization Required</div>
-                <p style="font-size: 0.9rem; color: #ffffff;">The agent is requesting permission to execute tool: <code>${step.tool_name}</code>.</p>
+                <p style="font-size: 0.9rem; color: var(--text-main);">The agent is requesting permission to execute tool: <code>${step.tool_name}</code>.</p>
                 <div class="approval-actions">
                     <button class="btn-approve" onclick="sendApproval('${taskId}', true)">Approve & Run</button>
                     <button class="btn-reject" onclick="sendApproval('${taskId}', false)">Reject</button>
@@ -190,7 +210,7 @@ function renderStepCard(step, taskId, awaitingApproval) {
     card.innerHTML = `
         <div class="step-header">
             <span class="step-title">${step.title}</span>
-            <span style="font-size: 0.75rem; color: #cbd5e1; font-family: monospace;">${step.timestamp > 0 ? step.timestamp + ' ms' : 'Step #' + step.step_number}</span>
+            <span style="font-size: 0.75rem; color: var(--white-subtle); font-family: monospace;">${step.timestamp > 0 ? step.timestamp + ' ms' : 'Step #' + step.step_number}</span>
         </div>
         <div class="step-content">${step.content}</div>
         ${citationsHtml}
@@ -203,7 +223,7 @@ function renderStepCard(step, taskId, awaitingApproval) {
 
 window.sendApproval = async function(taskId, approved) {
     const box = document.getElementById(`approval-box-${taskId}`);
-    if (box) box.innerHTML = `<span style="font-size:0.9rem; color:#ffffff;">Processing decision (${approved ? 'Approved' : 'Rejected'})...</span>`;
+    if (box) box.innerHTML = `<span style="font-size:0.9rem; color:var(--text-main);">Processing decision (${approved ? 'Approved' : 'Rejected'})...</span>`;
 
     try {
         const response = await fetch('/api/approve', {
@@ -236,12 +256,11 @@ function sendUserPrompt() {
     const prompt = input.value.trim();
     if (!prompt || !socket || socket.readyState !== WebSocket.OPEN) return;
 
-    // Append to Chat canvas
     const canvas = document.getElementById('chat-section');
     if (canvas) {
         const userCard = document.createElement('div');
         userCard.className = 'step-card';
-        userCard.style.borderLeft = '6px solid #ffffff';
+        userCard.style.borderLeft = '6px solid var(--cherry-red)';
         userCard.innerHTML = `
             <div class="step-header"><span class="step-title">👤 User Request</span></div>
             <div class="step-content">${prompt}</div>
@@ -257,9 +276,8 @@ function sendUserPrompt() {
     input.value = '';
 }
 
-// Seamless View Switching without jumping
+// Seamless View Switching
 window.showSection = function(section) {
-    currentActiveSection = section;
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
@@ -276,7 +294,7 @@ window.showSection = function(section) {
         document.getElementById('nav-swarm').classList.add('active');
         document.getElementById('view-title').textContent = 'Autonomous Sub-Agent Swarm';
         document.getElementById('view-subtitle').textContent = 'Live coordination across specialized agents';
-        if (inputDock) inputDock.style.display = 'block'; // Keep input bar accessible in Swarm!
+        if (inputDock) inputDock.style.display = 'block';
     } else if (section === 'tools') {
         document.getElementById('tools-section').style.display = 'flex';
         document.getElementById('nav-tools').classList.add('active');
@@ -297,7 +315,7 @@ window.showSection = function(section) {
 async function loadToolsGrid() {
     const grid = document.getElementById('tools-grid-list');
     if (!grid) return;
-    grid.innerHTML = '<span style="color:#ffffff;">Loading tool registry...</span>';
+    grid.innerHTML = '<span style="color:var(--text-main);">Loading tool registry...</span>';
     try {
         const res = await fetch('/api/tools');
         const tools = await res.json();
@@ -314,14 +332,14 @@ async function loadToolsGrid() {
             </div>
         `).join('');
     } catch (e) {
-        grid.innerHTML = '<span style="color:#ff1a47;">Failed to load tools.</span>';
+        grid.innerHTML = '<span style="color:#cd0029;">Failed to load tools.</span>';
     }
 }
 
 async function loadMemoryVault() {
     const grid = document.getElementById('vault-items-grid');
     if (!grid) return;
-    grid.innerHTML = '<span style="color:#ffffff;">Loading memory vault...</span>';
+    grid.innerHTML = '<span style="color:var(--text-main);">Loading memory vault...</span>';
     try {
         const res = await fetch('/api/memory');
         const memories = await res.json();
@@ -335,7 +353,7 @@ async function loadMemoryVault() {
             </div>
         `).join('');
     } catch (e) {
-        grid.innerHTML = '<span style="color:#ff1a47;">Failed to load memory.</span>';
+        grid.innerHTML = '<span style="color:#cd0029;">Failed to load memory.</span>';
     }
 }
 
@@ -359,6 +377,7 @@ window.saveNewMemory = async function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    applyTheme(currentTheme);
     initWebSocket();
 
     const btnSend = document.getElementById('btn-send');
