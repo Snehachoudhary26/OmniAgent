@@ -3,13 +3,11 @@
  */
 class HighVoltageBackground {
     constructor() {
-        // 1. Background 3D Galaxy Canvas (Bottom Layer)
         this.bgCanvas = document.createElement('canvas');
         this.bgCtx = this.bgCanvas.getContext('2d');
         this.bgCanvas.id = 'ambient-canvas';
         document.body.prepend(this.bgCanvas);
 
-        // 2. Dedicated Top-Layer Sparkle Canvas (Renders over All Sidebars & Buttons)
         this.sparkleCanvas = document.createElement('canvas');
         this.sparkleCtx = this.sparkleCanvas.getContext('2d');
         this.sparkleCanvas.id = 'sparkle-canvas';
@@ -19,7 +17,6 @@ class HighVoltageBackground {
         this.particles = [];
         this.orbitalRings = [];
         this.cometTrail = [];
-        this.confettiPops = [];
         this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, active: false };
         this.isThinking = false;
         this.isLightMode = document.body.classList.contains('light-theme');
@@ -76,41 +73,10 @@ class HighVoltageBackground {
         this.createOrbitals();
     }
 
-    // 🎉 Dramatic Cyber Party Popper Cannons
-    firePartyPopper(type = 'both') {
-        const colors = this.isLightMode 
-            ? ['#cd0029', '#ff003c', '#ff6b81', '#ff9f1a', '#e056fd', '#0f172a'] 
-            : ['#ff003c', '#ffffff', '#ff3b5c', '#ffd32a', '#0be881', '#ff5e57'];
+    // Party Popper disabled
+    firePartyPopper() {}
 
-        const origins = [];
-        if (type === 'left' || type === 'both') origins.push({ x: 30, y: this.height - 20, angle: -Math.PI / 4 });
-        if (type === 'right' || type === 'both') origins.push({ x: this.width - 30, y: this.height - 20, angle: -3 * Math.PI / 4 });
-        if (type === 'center') origins.push({ x: this.width / 2, y: this.height - 40, angle: -Math.PI / 2 });
-
-        origins.forEach(origin => {
-            for (let i = 0; i < 45; i++) {
-                const spread = (Math.random() - 0.5) * 0.85;
-                const speed = Math.random() * 18 + 10;
-                const finalAngle = origin.angle + spread;
-                this.confettiPops.push({
-                    x: origin.x,
-                    y: origin.y,
-                    vx: Math.cos(finalAngle) * speed,
-                    vy: Math.sin(finalAngle) * speed,
-                    gravity: 0.45,
-                    rotation: Math.random() * 360,
-                    rotSpeed: (Math.random() - 0.5) * 22,
-                    size: Math.random() * 9 + 5,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    shape: Math.random() > 0.4 ? 'rect' : 'circle',
-                    alpha: 1.0,
-                    decay: Math.random() * 0.015 + 0.012
-                });
-            }
-        });
-    }
-
-    // ✨ Bold, Glowing Cherry Red Cursor Sparkles Everywhere
+    // ✨ Bold Glowing Cherry Red Cursor Sparkles
     addCometParticle(x, y) {
         const redPalette = ['#ff003c', '#cd0029', '#ff1a47', '#ff4d6d', '#ffffff'];
         for (let i = 0; i < 4; i++) {
@@ -167,11 +133,9 @@ class HighVoltageBackground {
 
     setThinking(status) {
         this.isThinking = status;
-        if (status) this.firePartyPopper('center');
     }
 
     animate() {
-        // Clear both layers
         this.bgCtx.clearRect(0, 0, this.width, this.height);
         this.sparkleCtx.clearRect(0, 0, this.width, this.height);
 
@@ -180,7 +144,7 @@ class HighVoltageBackground {
         const speedMult = this.isThinking ? 3.0 : 1.0;
         this.angle += 0.008 * speedMult;
 
-        // --- LAYER 1: Full-Screen Background 3D Galaxy (bgCtx) ---
+        // Background Base
         if (this.isLightMode) {
             this.bgCtx.fillStyle = '#ffffff';
             this.bgCtx.fillRect(0, 0, this.width, this.height);
@@ -282,40 +246,7 @@ class HighVoltageBackground {
             }
         }
 
-        // --- LAYER 2: Top-Layer Sparkles & Party Popper Confetti (sparkleCtx) ---
-        // Confetti
-        for (let i = this.confettiPops.length - 1; i >= 0; i--) {
-            const c = this.confettiPops[i];
-            c.x += c.vx;
-            c.y += c.vy;
-            c.vy += c.gravity;
-            c.rotation += c.rotSpeed;
-            c.alpha -= c.decay;
-
-            if (c.alpha <= 0 || c.y > this.height + 50) {
-                this.confettiPops.splice(i, 1);
-                continue;
-            }
-
-            this.sparkleCtx.save();
-            this.sparkleCtx.translate(c.x, c.y);
-            this.sparkleCtx.rotate((c.rotation * Math.PI) / 180);
-            this.sparkleCtx.globalAlpha = c.alpha;
-            this.sparkleCtx.fillStyle = c.color;
-            this.sparkleCtx.shadowColor = c.color;
-            this.sparkleCtx.shadowBlur = 12;
-
-            if (c.shape === 'rect') {
-                this.sparkleCtx.fillRect(-c.size / 2, -c.size / 4, c.size, c.size / 2);
-            } else {
-                this.sparkleCtx.beginPath();
-                this.sparkleCtx.arc(0, 0, c.size / 2, 0, Math.PI * 2);
-                this.sparkleCtx.fill();
-            }
-            this.sparkleCtx.restore();
-        }
-
-        // ✨ Top-Layer Cursor Sparkle Trail (Visible over sidebars & buttons!)
+        // ✨ Top-Layer Cursor Sparkle Trail
         for (let i = this.cometTrail.length - 1; i >= 0; i--) {
             const c = this.cometTrail[i];
             c.x += c.vx;
