@@ -1,5 +1,5 @@
 /**
- * OmniAgent Ultra-Vivid 3D Orbitals & Explosive Party Popper Cannon Engine
+ * OmniAgent Ultra-Vivid 3D Orbitals & High-Voltage Cherry Red Cursor Sparkle Trail
  */
 class HighVoltageBackground {
     constructor() {
@@ -97,15 +97,25 @@ class HighVoltageBackground {
         });
     }
 
+    // ✨ Bold, Saturated High-Voltage Cherry Red Cursor Sparkles
     addCometParticle(x, y) {
-        this.cometTrail.push({
-            x: x,
-            y: y,
-            alpha: 1.0,
-            size: Math.random() * 5 + 3,
-            color: this.isLightMode ? '#cd0029' : (Math.random() > 0.5 ? '#ff003c' : '#ffffff')
-        });
-        if (this.cometTrail.length > 35) this.cometTrail.shift();
+        const redPalette = ['#ff003c', '#cd0029', '#ff1a47', '#ff4d6d', '#ffffff'];
+        for (let i = 0; i < 3; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 2.5 + 0.8;
+            this.cometTrail.push({
+                x: x + (Math.random() - 0.5) * 10,
+                y: y + (Math.random() - 0.5) * 10,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                alpha: 1.0,
+                size: Math.random() * 5.5 + 3.0,
+                color: redPalette[Math.floor(Math.random() * redPalette.length)],
+                glow: '#ff003c',
+                decay: Math.random() * 0.025 + 0.02
+            });
+        }
+        if (this.cometTrail.length > 70) this.cometTrail.splice(0, 10);
     }
 
     createParticles() {
@@ -155,7 +165,7 @@ class HighVoltageBackground {
         const speedMult = this.isThinking ? 3.0 : 1.0;
         this.angle += 0.008 * speedMult;
 
-        // Background Base (Crystal Sharp, No Haze)
+        // Background Base
         if (this.isLightMode) {
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillRect(0, 0, this.width, this.height);
@@ -292,23 +302,34 @@ class HighVoltageBackground {
             this.ctx.restore();
         }
 
-        // 5. Comet Trails
+        // 5. ✨ Radiant Glowing Cherry Red Comet Sparkle Trail
         for (let i = this.cometTrail.length - 1; i >= 0; i--) {
             const c = this.cometTrail[i];
-            c.alpha -= 0.035;
+            c.x += c.vx;
+            c.y += c.vy;
+            c.alpha -= c.decay;
+            
             if (c.alpha <= 0) {
                 this.cometTrail.splice(i, 1);
                 continue;
             }
+
+            this.ctx.save();
+            this.ctx.globalAlpha = Math.max(0, c.alpha);
             this.ctx.beginPath();
             this.ctx.arc(c.x, c.y, c.size * c.alpha, 0, Math.PI * 2);
             this.ctx.fillStyle = c.color;
-            this.ctx.shadowColor = '#ff003c';
-            this.ctx.shadowBlur = 14;
-            this.ctx.globalAlpha = c.alpha;
+            this.ctx.shadowColor = c.glow;
+            this.ctx.shadowBlur = 16;
             this.ctx.fill();
+
+            // Diamond Core Highlight
+            this.ctx.beginPath();
+            this.ctx.arc(c.x, c.y, (c.size * c.alpha) * 0.45, 0, Math.PI * 2);
+            this.ctx.fillStyle = '#ffffff';
             this.ctx.shadowBlur = 0;
-            this.ctx.globalAlpha = 1.0;
+            this.ctx.fill();
+            this.ctx.restore();
         }
 
         requestAnimationFrame(() => this.animate());
