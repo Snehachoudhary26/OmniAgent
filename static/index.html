@@ -50,9 +50,14 @@
                 </div>
                 
                 <div class="header-controls">
-                    <button class="btn-theme-toggle" id="btn-theme" onclick="toggleTheme()" title="Toggle Dark / Light Theme">
-                        ☀️ Light Mode
-                    </button>
+                    <!-- 3D Sliding Luxury Theme Switcher (Matching Reference) -->
+                    <div class="theme-switch-wrapper">
+                        <button class="theme-switch-btn" id="theme-slider-btn" onclick="toggleTheme()" title="Toggle Day / Night Mode">
+                            <span class="switch-label-text" id="switch-mode-text">NIGHT</span>
+                            <div class="switch-knob" id="switch-knob-icon">🌙</div>
+                        </button>
+                    </div>
+
                     <button class="btn-sound-toggle" id="btn-sound" onclick="toggleAudio()" title="Toggle Sci-Fi Cyber Sound FX">
                         🔊 Sound: ON
                     </button>

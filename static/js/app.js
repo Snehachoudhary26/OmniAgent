@@ -1,27 +1,32 @@
 /**
- * OmniAgent Studio Controller with Dark/Light Theme Switching
+ * OmniAgent Studio Controller with 3D Luxury Slider Toggle
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
 
-// Theme Toggle Function
+// 3D Slider Toggle
 window.toggleTheme = function() {
     currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('omni_theme', currentTheme);
     applyTheme(currentTheme);
+    playCyberSound('step');
 };
 
 function applyTheme(theme) {
-    const btn = document.getElementById('btn-theme');
+    const textElem = document.getElementById('switch-mode-text');
+    const iconElem = document.getElementById('switch-knob-icon');
+
     if (theme === 'light') {
         document.body.classList.add('light-theme');
-        if (btn) btn.textContent = '🌙 Dark Mode';
+        if (textElem) textElem.textContent = 'DAY';
+        if (iconElem) iconElem.textContent = '☀️';
         if (window.orbitalBg) window.orbitalBg.setTheme('light');
     } else {
         document.body.classList.remove('light-theme');
-        if (btn) btn.textContent = '☀️ Light Mode';
+        if (textElem) textElem.textContent = 'NIGHT';
+        if (iconElem) iconElem.textContent = '🌙';
         if (window.orbitalBg) window.orbitalBg.setTheme('dark');
     }
 }
@@ -276,7 +281,6 @@ function sendUserPrompt() {
     input.value = '';
 }
 
-// Seamless View Switching
 window.showSection = function(section) {
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
