@@ -1,23 +1,24 @@
 /**
- * OmniAgent Studio Complete Application Controller & Theme Engine
+ * OmniAgent Studio Complete Event Controller with Party Popper Cannon
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
 
-// Global Direct Theme Toggle
+// Global Theme Toggle
 window.toggleTheme = function() {
     currentTheme = (currentTheme === 'dark') ? 'light' : 'dark';
     localStorage.setItem('omni_theme', currentTheme);
     applyTheme(currentTheme);
-    playCyberSound('step');
+    playCyberSound('click');
+    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
 };
 
 function applyTheme(theme) {
+    const knob = document.getElementById('switch-knob-icon');
     if (theme === 'light') {
         document.body.classList.add('light-theme');
-        const knob = document.getElementById('switch-knob-icon');
         if (knob) knob.textContent = '☀️';
         if (window.orbitalBg) window.orbitalBg.setTheme('light');
     } else {
@@ -34,46 +35,71 @@ function playCyberSound(type) {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
         const now = audioCtx.currentTime;
 
-        if (type === 'send') {
+        if (type === 'click') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, now);
-            osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
-            gain.gain.setValueAtTime(0.15, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
             osc.start(now);
-            osc.stop(now + 0.12);
+            osc.stop(now + 0.05);
+        } else if (type === 'send') {
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + i * 0.03);
+                gain.gain.setValueAtTime(0.08, now + i * 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                osc.start(now + i * 0.03);
+                osc.stop(now + 0.22);
+            });
         } else if (type === 'step') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(587.33, now);
-            osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-            osc.start(now);
-            osc.stop(now + 0.08);
-        } else if (type === 'alert') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(300, now);
-            osc.frequency.setValueAtTime(600, now + 0.1);
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-            osc.start(now);
-            osc.stop(now + 0.25);
-        } else if (type === 'complete') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(523.25, now);
-            osc.frequency.setValueAtTime(659.25, now + 0.08);
-            osc.frequency.setValueAtTime(783.99, now + 0.16);
-            gain.gain.setValueAtTime(0.15, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.frequency.setValueAtTime(987.77, now);
+            osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.09);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
             osc.start(now);
-            osc.stop(now + 0.3);
+            osc.stop(now + 0.09);
+        } else if (type === 'alert') {
+            [440, 880].forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, now + i * 0.1);
+                gain.gain.setValueAtTime(0.15, now + i * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.start(now + i * 0.1);
+                osc.stop(now + 0.25);
+            });
+        } else if (type === 'complete') {
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                gain.gain.setValueAtTime(0.14, now + idx * 0.07);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                osc.start(now + idx * 0.07);
+                osc.stop(now + 0.45);
+            });
         }
     } catch (e) {}
 }
@@ -85,7 +111,7 @@ window.toggleAudio = function() {
         btn.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
         btn.style.borderColor = soundEnabled ? '#cd0029' : 'rgba(205,0,41,0.2)';
     }
-    if (soundEnabled) playCyberSound('send');
+    playCyberSound('click');
 };
 
 function initWebSocket() {
@@ -172,6 +198,7 @@ function handleAgentMessage(data) {
     if (data.completed) {
         playCyberSound('complete');
         updateAgentStatus('Core: Ready', false);
+        if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
     }
 }
 
@@ -224,6 +251,8 @@ function renderStepCard(step, taskId, awaitingApproval) {
 }
 
 window.sendApproval = async function(taskId, approved) {
+    playCyberSound('click');
+    if (window.orbitalBg) window.orbitalBg.firePartyPopper('center');
     const box = document.getElementById(`approval-box-${taskId}`);
     if (box) box.innerHTML = `<span style="font-size:0.9rem; color:var(--text-main);">Processing decision (${approved ? 'Approved' : 'Rejected'})...</span>`;
 
@@ -239,12 +268,15 @@ window.sendApproval = async function(taskId, approved) {
         }
         updateAgentStatus('Core: Ready', false);
         playCyberSound('complete');
+        if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
     } catch (e) {
         console.error(e);
     }
 };
 
 window.quickRun = function(promptText) {
+    playCyberSound('click');
+    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
     showSection('chat');
     const input = document.getElementById('user-input');
     if (!input) return;
@@ -257,6 +289,8 @@ function sendUserPrompt() {
     if (!input) return;
     const prompt = input.value.trim();
     if (!prompt || !socket || socket.readyState !== WebSocket.OPEN) return;
+
+    if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
 
     const canvas = document.getElementById('chat-section');
     if (canvas) {
@@ -279,6 +313,7 @@ function sendUserPrompt() {
 }
 
 window.showSection = function(section) {
+    playCyberSound('click');
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
@@ -359,6 +394,8 @@ async function loadMemoryVault() {
 }
 
 window.saveNewMemory = async function() {
+    playCyberSound('click');
+    if (window.orbitalBg) window.orbitalBg.firePartyPopper('center');
     const tag = document.getElementById('mem-new-tag').value.trim() || 'CustomFact';
     const text = document.getElementById('mem-new-text').value.trim();
     if (!text) return alert('Please enter fact text.');

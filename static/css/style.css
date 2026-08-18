@@ -2,14 +2,14 @@
     --cherry-red: #cd0029;
     --cherry-glow: #ff003c;
     --cherry-subtle: rgba(205, 0, 41, 0.22);
-    --cherry-border: rgba(205, 0, 41, 0.55);
+    --cherry-border: rgba(205, 0, 41, 0.65);
     --white: #ffffff;
     --white-muted: #f1f5f9;
     --white-subtle: #cbd5e1;
     --bg-dark: #050102;
-    --surface-glass: rgba(18, 3, 7, 0.9);
-    --surface-card: rgba(30, 4, 10, 0.9);
-    --border-glass: rgba(255, 255, 255, 0.18);
+    --surface-glass: rgba(18, 3, 7, 0.82);
+    --surface-card: rgba(30, 4, 10, 0.8);
+    --border-glass: rgba(255, 0, 60, 0.35);
     --text-main: #ffffff;
     --text-muted-theme: #f1f5f9;
     --input-bg: rgba(0, 0, 0, 0.7);
@@ -17,14 +17,14 @@
     --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* ☀️ Crisp Pure White + Cherry Red Light Mode Overrides */
+/* ☀️ Crisp Pure White + Vivid Cherry Red Light Mode */
 body.light-theme {
-    --bg-dark: #f8fafc;
-    --surface-glass: rgba(255, 255, 255, 0.96);
-    --surface-card: #ffffff;
-    --border-glass: rgba(205, 0, 41, 0.3);
-    --cherry-border: rgba(205, 0, 41, 0.45);
-    --cherry-subtle: rgba(205, 0, 41, 0.08);
+    --bg-dark: #ffffff;
+    --surface-glass: rgba(255, 255, 255, 0.88);
+    --surface-card: rgba(255, 255, 255, 0.92);
+    --border-glass: rgba(205, 0, 41, 0.4);
+    --cherry-border: rgba(205, 0, 41, 0.55);
+    --cherry-subtle: rgba(205, 0, 41, 0.1);
     --white: #0f172a;
     --white-muted: #1e293b;
     --white-subtle: #64748b;
@@ -39,13 +39,13 @@ body.light-theme .sidebar-nav,
 body.light-theme .workspace-header,
 body.light-theme .metrics-panel,
 body.light-theme .input-dock {
-    background: rgba(255, 255, 255, 0.96) !important;
-    border-color: rgba(205, 0, 41, 0.35) !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-color: rgba(205, 0, 41, 0.4) !important;
 }
 
 body.light-theme .main-workspace {
-    background: rgba(248, 250, 252, 0.8) !important;
-    border-color: rgba(205, 0, 41, 0.35) !important;
+    background: transparent !important;
+    border-color: rgba(205, 0, 41, 0.4) !important;
 }
 
 body.light-theme .step-card,
@@ -59,9 +59,9 @@ body.light-theme .memory-header-banner,
 body.light-theme .memory-input-card,
 body.light-theme .memory-chip,
 body.light-theme .agent-status-badge {
-    background: #ffffff !important;
-    border-color: rgba(205, 0, 41, 0.45) !important;
-    box-shadow: 0 4px 20px rgba(205, 0, 41, 0.12) !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    border-color: rgba(205, 0, 41, 0.5) !important;
+    box-shadow: 0 6px 24px rgba(205, 0, 41, 0.15) !important;
 }
 
 body.light-theme .step-title,
@@ -95,7 +95,7 @@ body.light-theme .memory-header-banner p {
 body.light-theme .input-wrapper {
     background: #ffffff !important;
     border-color: #cd0029 !important;
-    box-shadow: 0 0 16px rgba(205, 0, 41, 0.2) !important;
+    box-shadow: 0 0 20px rgba(205, 0, 41, 0.3) !important;
 }
 
 body.light-theme .input-box {
@@ -129,15 +129,13 @@ body {
     pointer-events: all;
 }
 
-/* 3-Column Layout */
+/* 3-Column Layout (Zero Obscuring Blur) */
 .app-container {
     position: relative;
     z-index: 10;
     display: grid;
     grid-template-columns: 280px 1fr 340px;
     height: 100vh;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
 
 /* Left Sidebar */
@@ -164,7 +162,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    filter: drop-shadow(0 0 12px var(--cherry-glow));
+    filter: drop-shadow(0 0 14px var(--cherry-glow));
     transition: transform 0.3s ease;
 }
 
@@ -254,7 +252,7 @@ body {
     color: var(--cherry-red);
     background: var(--cherry-subtle);
     border-color: var(--cherry-red);
-    box-shadow: 0 0 20px rgba(205, 0, 41, 0.25);
+    box-shadow: 0 0 20px rgba(205, 0, 41, 0.35);
     transform: translateX(4px);
 }
 
@@ -290,12 +288,12 @@ body {
     color: var(--text-main);
 }
 
-/* Center Workspace */
+/* Center Workspace (Fully Transparent to Show Vivid Orbitals) */
 .main-workspace {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background: rgba(8, 2, 4, 0.25);
+    background: transparent;
     border-right: 1.5px solid var(--cherry-border);
     overflow: hidden;
     position: relative;
@@ -330,7 +328,7 @@ body {
     gap: 16px;
 }
 
-/* 🌟 Luxury 3D Animated Slider (Exact Reference Match, Zero Overlap) */
+/* 🌟 Luxury 3D Animated Slider */
 .theme-switch-btn {
     position: relative;
     width: 155px;
@@ -706,7 +704,6 @@ body.light-theme .switch-knob {
     border: 1.5px solid var(--border-glass);
     border-radius: 18px;
     padding: 22px;
-    backdrop-filter: blur(16px);
     animation: slideUp 0.3s ease-out;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
@@ -1010,8 +1007,6 @@ body.light-theme .switch-knob {
         left: 0;
         width: 100%;
         background: var(--surface-glass);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
         border-top: 1.5px solid var(--cherry-border);
         padding: 12px 0;
         z-index: 50;
