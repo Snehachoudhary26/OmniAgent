@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OmniAgent — Authentication Gateway</title>
+    <meta name="description" content="Autonomous AI Studio Authentication & Gateway">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body>
+    <div class="auth-page-wrapper">
+        <!-- Top Navigation Bar -->
+        <header class="auth-header">
+            <div id="brand-logo-container" onclick="window.location.href='/'" style="cursor:pointer;"></div>
+            
+            <div class="auth-header-right">
+                <!-- 3D Luxury Slider Switcher -->
+                <button class="theme-switch-btn" id="theme-slider-btn" type="button" onclick="toggleTheme()" title="Toggle Day / Night Mode">
+                    <span class="switch-label-night">NIGHT MODE</span>
+                    <span class="switch-label-day">DAY MODE</span>
+                    <div class="switch-knob" id="switch-knob-icon">🌙</div>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dual Auth Card Container -->
+        <main class="auth-main-container">
+            <!-- Left Card: Welcome Back (Sign In) -->
+            <div class="auth-glass-card signin-card" id="card-signin">
+                <div class="auth-card-hero">
+                    <!-- Revolving Gyroscope Centerpiece Logo -->
+                    <div id="card-gyro-logo"></div>
+                    <h2 class="auth-card-title">Welcome Back</h2>
+                    <p class="auth-card-subtitle">Sign in to continue your autonomous journey</p>
+                </div>
+
+                <form class="auth-form" onsubmit="handleAuthSubmit(event, 'signin')">
+                    <div class="auth-input-group">
+                        <div class="auth-input-icon">👤</div>
+                        <input type="text" id="signin-user" class="auth-input-field" placeholder="Email or Username" required autofocus>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <div class="auth-input-icon">🔒</div>
+                        <input type="password" id="signin-pass" class="auth-input-field" placeholder="Password" required>
+                        <button type="button" class="btn-pwd-eye" onclick="togglePasswordVisibility('signin-pass', this)" title="Show/Hide Password">👁️</button>
+                    </div>
+
+                    <div class="auth-row-options">
+                        <label class="auth-checkbox-label">
+                            <input type="checkbox" id="remember-me" checked>
+                            <span>Remember Me</span>
+                        </label>
+                        <a href="javascript:void(0)" class="auth-link" onclick="playSoftClick(); alert('Demo Mode: Enter any credentials or click Social Login!')">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-auth-primary">
+                        <span>Sign In</span>
+                        <div class="btn-arrow-circle">➔</div>
+                    </button>
+
+                    <div class="auth-divider">
+                        <span>or continue with</span>
+                    </div>
+
+                    <!-- Social Login Row -->
+                    <div class="social-login-row">
+                        <button type="button" class="btn-social-pill" onclick="demoSocialLogin('Google')">
+                            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="btn-social-pill" onclick="demoSocialLogin('GitHub')">
+                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                            <span>GitHub</span>
+                        </button>
+                        <button type="button" class="btn-social-pill" onclick="demoSocialLogin('Microsoft')">
+                            <svg width="18" height="18" viewBox="0 0 23 23"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
+                            <span>Microsoft</span>
+                        </button>
+                    </div>
+
+                    <!-- Switcher Ribbon -->
+                    <div class="auth-switch-ribbon" onclick="focusSignupCard()">
+                        <div class="ribbon-icon">⚡</div>
+                        <div class="ribbon-text">
+                            <strong>New to OmniAgent Studio?</strong>
+                            <span>Create your account and start building intelligent agents.</span>
+                        </div>
+                        <div class="ribbon-arrow">➔</div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Card: Create Your Account (Sign Up) -->
+            <div class="auth-glass-card signup-card" id="card-signup">
+                <div class="auth-card-hero">
+                    <div class="hero-card-badge">🚀</div>
+                    <h2 class="auth-card-title">Create Your Account</h2>
+                    <p class="auth-card-subtitle">Join the next generation of Autonomous AI Studio</p>
+                </div>
+
+                <form class="auth-form" onsubmit="handleAuthSubmit(event, 'signup')">
+                    <!-- First & Last Name Split Row -->
+                    <div class="auth-input-split-row">
+                        <div class="auth-input-group">
+                            <div class="auth-input-icon">👤</div>
+                            <input type="text" id="signup-fname" class="auth-input-field" placeholder="First Name" required>
+                        </div>
+                        <div class="auth-input-group">
+                            <div class="auth-input-icon">👤</div>
+                            <input type="text" id="signup-lname" class="auth-input-field" placeholder="Last Name" required>
+                        </div>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <div class="auth-input-icon">✉️</div>
+                        <input type="email" id="signup-email" class="auth-input-field" placeholder="Email Address" required>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <div class="auth-input-icon">🔒</div>
+                        <input type="password" id="signup-pass" class="auth-input-field" placeholder="Password" required>
+                        <button type="button" class="btn-pwd-eye" onclick="togglePasswordVisibility('signup-pass', this)" title="Show/Hide Password">👁️</button>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <div class="auth-input-icon">🔒</div>
+                        <input type="password" id="signup-cpass" class="auth-input-field" placeholder="Confirm Password" required>
+                        <button type="button" class="btn-pwd-eye" onclick="togglePasswordVisibility('signup-cpass', this)" title="Show/Hide Password">👁️</button>
+                    </div>
+
+                    <!-- Role Selector Section -->
+                    <div class="auth-role-section">
+                        <div class="auth-role-label">👥 Choose Your Role</div>
+                        <div class="auth-role-pills">
+                            <div class="role-pill active" onclick="selectRole(this, 'developer')">
+                                <span class="role-pill-icon">&lt;/&gt;</span>
+                                <span>Developer</span>
+                            </div>
+                            <div class="role-pill" onclick="selectRole(this, 'researcher')">
+                                <span class="role-pill-icon">🧪</span>
+                                <span>Researcher</span>
+                            </div>
+                            <div class="role-pill" onclick="selectRole(this, 'business')">
+                                <span class="role-pill-icon">💼</span>
+                                <span>Business</span>
+                            </div>
+                            <div class="role-pill" onclick="selectRole(this, 'student')">
+                                <span class="role-pill-icon">🎓</span>
+                                <span>Student</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auth-row-options">
+                        <label class="auth-checkbox-label">
+                            <input type="checkbox" id="terms-agree" checked required>
+                            <span>I agree to the <a href="javascript:void(0)" class="auth-link">Terms & Conditions</a> and <a href="javascript:void(0)" class="auth-link">Privacy Policy</a></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-auth-primary">
+                        <span>Create Account</span>
+                        <div class="btn-arrow-circle">➔</div>
+                    </button>
+
+                    <!-- Bottom Info Banner -->
+                    <div class="auth-info-banner">
+                        <div class="info-icon">🚀</div>
+                        <div class="info-text">
+                            <strong>Start Building Tomorrow's Intelligence Today</strong>
+                            <span>Powerful. Autonomous. Limitless.</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- Bottom 4 Feature Cards Ribbon -->
+        <footer class="auth-bottom-dock">
+            <div class="dock-feature-card">
+                <div class="dock-icon">🤖</div>
+                <div class="dock-content">
+                    <h4>Autonomous Agents</h4>
+                    <p>Build & Deploy Intelligent Workflows</p>
+                </div>
+            </div>
+
+            <div class="dock-feature-card">
+                <div class="dock-icon">🧠</div>
+                <div class="dock-content">
+                    <h4>Multi-Model AI</h4>
+                    <p>DeepSeek • OpenAI • Gemini & More</p>
+                </div>
+            </div>
+
+            <div class="dock-feature-card">
+                <div class="dock-icon">🌐</div>
+                <div class="dock-content">
+                    <h4>Live Web Studio</h4>
+                    <p>Access & Manage from Anywhere</p>
+                </div>
+            </div>
+
+            <div class="dock-feature-card">
+                <div class="dock-icon">🛡️</div>
+                <div class="dock-content">
+                    <h4>Enterprise Ready</h4>
+                    <p>Secure • Scalable • Reliable</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/background.js"></script>
+    <script src="/static/js/logo.js"></script>
+    <script src="/static/js/auth.js"></script>
+</body>
+</html>

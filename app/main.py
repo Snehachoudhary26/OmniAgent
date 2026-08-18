@@ -26,6 +26,11 @@ async def get_index():
     index_path = os.path.join(static_dir, "index.html")
     return FileResponse(index_path)
 
+@app.get("/login")
+async def get_login():
+    login_path = os.path.join(static_dir, "login.html")
+    return FileResponse(login_path)
+
 @app.get("/api/health")
 async def health_check():
     return {
@@ -124,7 +129,6 @@ async def websocket_agent_endpoint(websocket: WebSocket):
                 await websocket.send_json({"error": "Empty prompt received."})
                 continue
 
-            # Stream ReAct steps in real-time
             async for step_packet in agent_engine.run_react_stream(
                 prompt=prompt,
                 api_key=api_key,
