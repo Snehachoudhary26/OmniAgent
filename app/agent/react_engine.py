@@ -2,6 +2,7 @@ import time
 import json
 import uuid
 import re
+import os
 import urllib.request
 import urllib.error
 from typing import Dict, Any, List, Optional, AsyncGenerator
@@ -10,12 +11,27 @@ from app.agent.memory import MemoryVault
 from app.agent.tools import ToolRegistry
 from app.agent.observability import ObservabilityTracer
 
+def load_env_key():
+    # Direct safe environment loader
+    key = os.getenv("GEMINI_API_KEY")
+    if not key:
+        env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), ".env")
+        if os.path.exists(env_file):
+            with open(env_file, "r") as f:
+                for line in f:
+                    if line.strip().startswith("GEMINI_API_KEY="):
+                        key = line.strip().split("=", 1)[1].strip()
+                        os.environ["GEMINI_API_KEY"] = key
+                        break
+    return key
+
 class ReActAgentEngine:
     def __init__(self):
         self.memory_vault = MemoryVault()
         self.tool_registry = ToolRegistry()
         self.tracer = ObservabilityTracer()
         self.pending_tasks: Dict[str, Dict[str, Any]] = {}
+        self.default_gemini_key = load_env_key()
         self.swarm_agents = [
             {"id": "scout", "name": "Scout Agent", "role": "Web Researcher & RAG Ingestion", "status": "idle", "color": "#ffffff"},
             {"id": "compute", "name": "Compute Agent", "role": "Sandboxed Python & Math Engine", "status": "idle", "color": "#cd0029"},
@@ -26,6 +42,7 @@ class ReActAgentEngine:
         self, prompt: str, api_key: Optional[str] = None, model_provider: str = "free-gemini",
         persona: str = "architect", temperature: float = 0.7
     ) -> AsyncGenerator[Dict[str, Any], None]:
+        active_key = api_key or self.default_gemini_key or load_env_key()
         self.tracer.start_trace()
         task_id = str(uuid.uuid4())[:8]
         step_counter = 1
@@ -119,7 +136,7 @@ class ReActAgentEngine:
                 "selected_tool": selected_tool,
                 "tool_args": tool_args,
                 "step_counter": step_counter,
-                "api_key": api_key
+                "api_key": active_key
             }
             self.tracer.record_step("APPROVAL_REQUIRED", approval_step.content, selected_tool)
             yield {
@@ -172,8 +189,8 @@ class ReActAgentEngine:
         }
         step_counter += 1
 
-        # 6. Final Grounded Synthesis
-        synthesis = self._generate_synthesis(prompt, selected_tool, raw_output, citations_data, api_key, active_persona_title)
+        # 6. Final Grounded Synthesis (Powered by Gemini AI)
+        synthesis = self._generate_synthesis(prompt, selected_tool, raw_output, citations_data, active_key, active_persona_title)
         final_step = AgentStep(
             step_number=step_counter,
             step_type=StepType.FINAL_ANSWER,
@@ -244,14 +261,19 @@ class ReActAgentEngine:
         return steps_out
 
     def _generate_synthesis(self, prompt: str, tool: str, tool_output: str, citations: List[Citation], api_key: Optional[str], persona_name: str) -> str:
+        # 🌟 Live Google Gemini 1.5 Generative AI Call
         if api_key and api_key.strip():
             try:
-                endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+                endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key.strip()}"
+                system_instruction = (
+                    f"You are OmniAgent, a world-class autonomous AI agent operating in persona: [{persona_name}]. "
+                    f"Synthesize a polished, professional response answering the user's objective: '{prompt}'. "
+                    f"Incorporate the verified data returned by the tool '{tool}':\n{tool_output}\n"
+                    f"Format with structured markdown, bold key takeaways, and bullet points."
+                )
                 payload = {
                     "contents": [{
-                        "parts": [{
-                            "text": f"You are OmniAgent operating as [{persona_name}]. User asked: '{prompt}'. Tool '{tool}' returned: '{tool_output}'. Provide a concise, structured final response with citations if applicable."
-                        }]
+                        "parts": [{ "text": system_instruction }]
                     }]
                 }
                 req = urllib.request.Request(
@@ -259,10 +281,11 @@ class ReActAgentEngine:
                     data=json.dumps(payload).encode("utf-8"),
                     headers={"Content-Type": "application/json"}
                 )
-                with urllib.request.urlopen(req, timeout=8) as res:
+                with urllib.request.urlopen(req, timeout=10) as res:
                     data = json.loads(res.read().decode("utf-8"))
-                    return data["candidates"][0]["content"]["parts"][0]["text"]
-            except Exception:
+                    text = data["candidates"][0]["content"]["parts"][0]["text"]
+                    return text
+            except Exception as e:
                 pass
 
         cite_badges = " ".join([f"[[{c.id}]]({c.source_url})" for c in citations]) if citations else ""

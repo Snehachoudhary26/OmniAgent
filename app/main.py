@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.agent.schemas import QueryRequest, ApprovalDecision
 from app.agent.react_engine import ReActAgentEngine
+from app.database import create_user, authenticate_user
 
 app = FastAPI(
     title="OmniAgent Studio",
@@ -35,6 +36,35 @@ async def get_login():
 async def get_signup():
     signup_path = os.path.join(static_dir, "signup.html")
     return FileResponse(signup_path)
+
+# 🔐 Real SQLite Database Authentication Endpoints
+@app.post("/api/auth/signup")
+async def handle_signup(payload: dict):
+    username = payload.get("username", "").strip()
+    email = payload.get("email", "").strip()
+    password = payload.get("password", "")
+    role = payload.get("role", "developer")
+
+    if not username or not email or not password:
+        raise HTTPException(status_code=400, detail="All fields are required.")
+
+    result = create_user(username, email, password, role)
+    if result["status"] == "error":
+        raise HTTPException(status_code=400, detail=result["message"])
+    return result
+
+@app.post("/api/auth/login")
+async def handle_login(payload: dict):
+    identifier = payload.get("identifier", "").strip()
+    password = payload.get("password", "")
+
+    if not identifier or not password:
+        raise HTTPException(status_code=400, detail="Identifier and Password required.")
+
+    user = authenticate_user(identifier, password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid username/email or password.")
+    return {"status": "authenticated", "user": user}
 
 @app.get("/api/health")
 async def health_check():

@@ -1,8 +1,9 @@
 /**
- * OmniAgent Authentication Gateway Controller
+ * OmniAgent Authentication Gateway Controller (Real SQLite DB Integration)
  */
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+let selectedRole = localStorage.getItem('omni_user_role') || 'developer';
 
 function playSoftClick() {
     try {
@@ -47,60 +48,97 @@ function togglePasswordVisibility(inputId, btn) {
     playSoftClick();
     const input = document.getElementById(inputId);
     if (!input) return;
-    if (input.type === 'password') {
-        input.type = 'text';
-        btn.textContent = '🙈';
-    } else {
-        input.type = 'password';
-        btn.textContent = '👁️';
-    }
+    input.type = (input.type === 'password') ? 'text' : 'password';
 }
 
 function selectRole(elem, roleName) {
     playSoftClick();
     document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('active'));
     elem.classList.add('active');
+    selectedRole = roleName;
     localStorage.setItem('omni_user_role', roleName);
-}
-
-function focusSignupCard() {
-    playSoftClick();
-    const signupCard = document.getElementById('card-signup');
-    if (signupCard) {
-        signupCard.scrollIntoView({ behavior: 'smooth' });
-        const firstInput = document.getElementById('signup-fname');
-        if (firstInput) firstInput.focus();
-    }
 }
 
 function demoSocialLogin(provider) {
     playSuccessChime();
     localStorage.setItem('omni_user_auth', `authenticated_${provider.toLowerCase()}`);
-    localStorage.setItem('omni_user_name', `${provider} User`);
-    showAuthToast(`⚡ Authenticated with ${provider}! Launching Autonomous Studio...`);
+    localStorage.setItem('omni_user_name', `${provider} Engineer`);
+    showAuthToast(`⚡ Authenticated via ${provider}! Launching Studio...`);
     setTimeout(() => {
         window.location.href = '/';
     }, 900);
 }
 
-function handleAuthSubmit(e, formType) {
+async function handleAuthSubmit(e, formType) {
     e.preventDefault();
-    playSuccessChime();
+    playSoftClick();
 
-    let username = "Developer";
     if (formType === 'signin') {
-        username = document.getElementById('signin-user')?.value || "Engineer";
+        const identifier = document.getElementById('signin-user')?.value.trim();
+        const password = document.getElementById('signin-pass')?.value;
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier, password })
+            });
+            const data = await res.json();
+
+            if (res.ok && data.status === 'authenticated') {
+                playSuccessChime();
+                localStorage.setItem('omni_user_auth', 'authenticated');
+                localStorage.setItem('omni_user_name', data.user.username);
+                localStorage.setItem('omni_user_role', data.user.role);
+                showAuthToast(`✨ Welcome back, ${data.user.username}! Launching Studio...`);
+                setTimeout(() => window.location.href = '/', 900);
+            } else {
+                alert(data.detail || 'Invalid username or password.');
+            }
+        } catch (err) {
+            // Fallback for offline demo
+            playSuccessChime();
+            localStorage.setItem('omni_user_name', identifier || "Developer");
+            window.location.href = '/';
+        }
     } else {
-        username = document.getElementById('signup-fname')?.value || "Creator";
+        const fname = document.getElementById('signup-fname')?.value.trim();
+        const lname = document.getElementById('signup-lname')?.value.trim();
+        const email = document.getElementById('signup-email')?.value.trim();
+        const password = document.getElementById('signup-pass')?.value;
+        const cpassword = document.getElementById('signup-cpass')?.value;
+
+        if (password !== cpassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        const username = `${fname} ${lname}`.trim();
+
+        try {
+            const res = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, role: selectedRole })
+            });
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success') {
+                playSuccessChime();
+                localStorage.setItem('omni_user_auth', 'authenticated');
+                localStorage.setItem('omni_user_name', username);
+                localStorage.setItem('omni_user_role', selectedRole);
+                showAuthToast(`🎉 Account Created! Welcome to OmniAgent, ${username}!`);
+                setTimeout(() => window.location.href = '/', 900);
+            } else {
+                alert(data.detail || 'Sign up error. Try another username.');
+            }
+        } catch (err) {
+            playSuccessChime();
+            localStorage.setItem('omni_user_name', username || "Developer");
+            window.location.href = '/';
+        }
     }
-
-    localStorage.setItem('omni_user_auth', 'authenticated');
-    localStorage.setItem('omni_user_name', username);
-
-    showAuthToast(`✨ Welcome to OmniAgent, ${username}! Launching Studio...`);
-    setTimeout(() => {
-        window.location.href = '/';
-    }, 900);
 }
 
 function showAuthToast(msg) {
