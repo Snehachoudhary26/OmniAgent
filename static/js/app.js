@@ -1,5 +1,5 @@
 /**
- * OmniAgent Studio Complete Controller with Diagnostic Handler & Clear Text Cards
+ * OmniAgent Studio Complete Controller with Dynamic Tab Highlighting
  */
 let socket = null;
 let soundEnabled = true;
@@ -392,6 +392,7 @@ function sendUserPrompt() {
     input.value = '';
 }
 
+// 🔀 Active Tab Router: Shifts the Red Highlight to ONLY the clicked button!
 window.showSection = function(section) {
     playCyberSound('click');
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
