@@ -1,5 +1,5 @@
 /**
- * OmniAgent Studio Complete Controller
+ * OmniAgent Studio Complete Controller (Mobile Responsive + WebSocket + Database)
  */
 let socket = null;
 let soundEnabled = true;
@@ -23,7 +23,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Check Logged-in User
 function checkUserSession() {
     const authText = document.getElementById('sidebar-auth-text');
     const userName = localStorage.getItem('omni_user_name');
@@ -270,7 +269,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// 📥 Export Session to Markdown or JSON
 window.exportSession = function(format) {
     playCyberSound('complete');
     const menu = document.getElementById('export-dropdown');
@@ -337,7 +335,7 @@ function downloadFile(filename, text, type) {
     document.body.removeChild(link);
 }
 
-// 🗑️ Clear Session & Reset Telemetry
+// 🗑️ Clear Session & Reset
 window.clearSession = function() {
     playCyberSound('click');
     const canvas = document.getElementById('chat-section');
@@ -378,7 +376,7 @@ window.clearSession = function() {
     showDiagnosticToast('🗑️ Session History Cleared & Reset!');
 };
 
-// ⚡ Live System Diagnostics on "Core: Ready" Click
+// ⚡ Live Diagnostics
 window.runDiagnostics = async function() {
     playCyberSound('click');
     const dot = document.querySelector('.status-dot');
@@ -398,7 +396,7 @@ window.runDiagnostics = async function() {
         }
         if (text) text.textContent = 'Core: 100% OK';
 
-        showDiagnosticToast(`⚡ Diagnostic Passed • Latency: ${lat}ms • Tools Active: ${data.tools_count || 5} • Memory Synced`);
+        showDiagnosticToast(`⚡ Diagnostic Passed • Latency: ${lat}ms • Tools Active: ${data.tools_count || 5}`);
         playCyberSound('complete');
 
         setTimeout(() => {
@@ -426,12 +424,12 @@ function showDiagnosticToast(msg) {
     setTimeout(() => {
         toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
         toast.style.opacity = '0';
-        toast.style.transform = 'translateY(15px)';
+        toast.style.transform = (window.innerWidth <= 768) ? 'translateX(-50%) translateY(-15px)' : 'translateY(15px)';
         setTimeout(() => toast.remove(), 400);
-    }, 3500);
+    }, 3200);
 }
 
-// Authentic Feather-Light iOS / Mac Keyboard Tap & Audio Engine
+// Audio Feedback
 function playCyberSound(type) {
     if (!soundEnabled) return;
     try {
@@ -560,7 +558,6 @@ window.toggleAudio = function() {
     const btn = document.getElementById('btn-sound');
     if (btn) {
         btn.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
-        btn.style.borderColor = soundEnabled ? '#cd0029' : 'rgba(205,0,41,0.2)';
     }
     playCyberSound('click');
 };
@@ -609,15 +606,15 @@ function updateSwarmStatus(activeAgent, stepContent) {
         if (agent === activeAgent) {
             card.style.borderColor = '#cd0029';
             card.style.background = 'var(--cherry-subtle)';
-            card.style.boxShadow = '0 0 30px rgba(205, 0, 41, 0.4)';
-            if (badge) { badge.textContent = 'Active & Processing ⚡'; badge.style.color = '#cd0029'; }
+            card.style.boxShadow = '0 0 24px rgba(205, 0, 41, 0.4)';
+            if (badge) { badge.textContent = 'Active ⚡'; badge.style.color = '#cd0029'; }
             if (stepContent && descElem) {
-                descElem.innerHTML = `<span style="color:var(--text-main); font-weight:700;">${stepContent.substring(0, 160)}...</span>`;
+                descElem.innerHTML = `<span style="color:var(--text-main); font-weight:700;">${stepContent.substring(0, 140)}...</span>`;
             }
         } else {
             card.style.borderColor = 'var(--cherry-border)';
             card.style.background = 'var(--surface-card)';
-            card.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.1)';
+            card.style.boxShadow = 'none';
             if (badge) { badge.textContent = 'Standby'; badge.style.color = 'var(--white-subtle)'; }
         }
     });
@@ -665,7 +662,7 @@ function renderStepCard(step, taskId, awaitingApproval) {
             <div class="citation-container">
                 ${step.citations.map(c => `
                     <a href="${c.source_url}" target="_blank" class="citation-chip">
-                        🔗 [${c.id}] ${c.source_title.substring(0, 26)}...
+                        🔗 [${c.id}] ${c.source_title.substring(0, 24)}...
                     </a>
                 `).join('')}
             </div>
@@ -741,7 +738,7 @@ function sendUserPrompt() {
     if (canvas) {
         const userCard = document.createElement('div');
         userCard.className = 'step-card';
-        userCard.style.borderLeft = '6px solid var(--cherry-red)';
+        userCard.style.borderLeft = '4px solid var(--cherry-red)';
         userCard.innerHTML = `
             <div class="step-header"><span class="step-title">👤 User Request</span></div>
             <div class="step-content">${prompt}</div>
@@ -761,29 +758,35 @@ function sendUserPrompt() {
     input.value = '';
 }
 
-// 🔀 Active Tab Router
+// 🔀 Active Tab Router (Updates Desktop Nav + Mobile Bottom Nav)
 window.showSection = function(section) {
     playCyberSound('click');
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.mobile-nav-btn').forEach(el => el.classList.remove('active'));
 
     const inputDock = document.querySelector('.input-dock');
 
+    // Sync Desktop Sidebar Active Item
+    const deskItem = document.getElementById('nav-' + section);
+    if (deskItem) deskItem.classList.add('active');
+
+    // Sync Mobile Bottom Bar Active Item
+    const mobItem = document.getElementById('mob-btn-' + section);
+    if (mobItem) mobItem.classList.add('active');
+
     if (section === 'chat') {
         document.getElementById('chat-section').style.display = 'flex';
-        document.getElementById('nav-chat').classList.add('active');
         document.getElementById('view-title').textContent = 'Autonomous Reasoning Studio';
         document.getElementById('view-subtitle').textContent = 'ReAct Planning • Multi-Agent Swarm • Human-in-the-Loop';
         if (inputDock) inputDock.style.display = 'block';
     } else if (section === 'swarm') {
         document.getElementById('swarm-section').style.display = 'flex';
-        document.getElementById('nav-swarm').classList.add('active');
         document.getElementById('view-title').textContent = 'Autonomous Sub-Agent Swarm';
         document.getElementById('view-subtitle').textContent = 'Live coordination across specialized agents';
         if (inputDock) inputDock.style.display = 'block';
     } else if (section === 'code') {
         document.getElementById('code-section').style.display = 'flex';
-        document.getElementById('nav-code').classList.add('active');
         document.getElementById('view-title').textContent = 'Interactive Python Code Sandbox';
         document.getElementById('view-subtitle').textContent = 'Live REPL Execution • Algorithmic Prototyping • Code Optimizer';
         if (inputDock) inputDock.style.display = 'none';
@@ -792,14 +795,12 @@ window.showSection = function(section) {
         }
     } else if (section === 'tools') {
         document.getElementById('tools-section').style.display = 'flex';
-        document.getElementById('nav-tools').classList.add('active');
         document.getElementById('view-title').textContent = 'Active Dynamic Tool Registry';
         document.getElementById('view-subtitle').textContent = 'Capability-based tools with schema guardrails';
         if (inputDock) inputDock.style.display = 'none';
         loadToolsGrid();
     } else if (section === 'memory') {
         document.getElementById('memory-section').style.display = 'flex';
-        document.getElementById('nav-memory').classList.add('active');
         document.getElementById('view-title').textContent = 'Long-Term Semantic Vector Vault';
         document.getElementById('view-subtitle').textContent = 'Persistent cross-session knowledge & facts';
         if (inputDock) inputDock.style.display = 'none';
