@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b8001d"/>
+      <stop offset="100%" stop-color="#8a0012"/>
+    </linearGradient>
+  </defs>
+  <!-- Red Squircle Base -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  
+  <!-- Outer Dashed Ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#ffffff" stroke-width="20" stroke-dasharray="38 24" stroke-linecap="round"/>
+  
+  <!-- 4 Orbital Satellites -->
+  <circle cx="256" cy="76" r="22" fill="#ffffff"/>
+  <circle cx="256" cy="436" r="22" fill="#ffffff"/>
+  <circle cx="76" cy="256" r="22" fill="#ffffff"/>
+  <circle cx="436" cy="256" r="22" fill="#ffffff"/>
+  
+  <!-- Dual Gyroscope Orbitals -->
+  <ellipse cx="256" cy="256" rx="148" ry="68" fill="none" stroke="#ffffff" stroke-width="22" transform="rotate(-28 256 256)"/>
+  <ellipse cx="256" cy="256" rx="148" ry="68" fill="none" stroke="#ffffff" stroke-width="22" transform="rotate(28 256 256)"/>
+  
+  <!-- Central Nucleus -->
+  <circle cx="256" cy="256" r="40" fill="#ffffff"/>
+  <path d="M 238 246 A 20 20 0 0 1 248 236" fill="none" stroke="#a50017" stroke-width="6" stroke-linecap="round"/>
+</svg>

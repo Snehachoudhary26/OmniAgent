@@ -5,18 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OmniAgent — Autonomous Reasoning Studio</title>
     
-    <!-- 🌟 Browser Tab URL Icon (Forces instant browser refresh) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/omni-icon.png?v=2026">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/omni-icon.png?v=2026">
-    <link rel="shortcut icon" type="image/png" href="/static/omni-icon.png?v=2026">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/omni-icon.png?v=2026">
+    <!-- 🌟 Instant Zero-Cache Browser Tab Icon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%23a50017'/%3E%3Ccircle cx='256' cy='256' r='180' fill='none' stroke='%23ffffff' stroke-width='20' stroke-dasharray='38 24' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='76' r='22' fill='%23ffffff'/%3E%3Ccircle cx='256' cy='436' r='22' fill='%23ffffff'/%3E%3Ccircle cx='76' cy='256' r='22' fill='%23ffffff'/%3E%3Ccircle cx='436' cy='256' r='22' fill='%23ffffff'/%3E%3Cellipse cx='256' cy='256' rx='148' ry='68' fill='none' stroke='%23ffffff' stroke-width='22' transform='rotate(-28 256 256)'/%3E%3Cellipse cx='256' cy='256' rx='148' ry='68' fill='none' stroke='%23ffffff' stroke-width='22' transform='rotate(28 256 256)'/%3E%3Ccircle cx='256' cy='256' r='40' fill='%23ffffff'/%3E%3Cpath d='M 238 246 A 20 20 0 0 1 248 236' fill='none' stroke='%23a50017' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="/static/favicon.svg">
     <meta name="theme-color" content="#a50017">
 
     <!-- 🌐 Rich Social Share Previews -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="OmniAgent — Autonomous Reasoning Studio">
     <meta property="og:description" content="Next-Gen Autonomous Agentic AI Workspace with ReAct Planning, Multi-Agent Swarm, Python Sandbox & Human-in-the-Loop.">
-    <meta property="og:image" content="/static/omni-icon.png">
+    <meta property="og:image" content="/static/favicon.svg">
     <meta name="twitter:card" content="summary_large_image">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,7 +70,6 @@
 
         <!-- 3-Column Studio Body -->
         <div class="app-body-container">
-            <!-- Left Sidebar Navigation -->
             <aside class="sidebar-nav" id="sidebar-nav">
                 <ul class="nav-links">
                     <li class="nav-item active" id="nav-chat" onclick="showSection('chat')">
@@ -97,7 +94,6 @@
                     </li>
                 </ul>
 
-                <!-- 👤 Account Portal Gateway -->
                 <div class="account-gateway-wrapper">
                     <div class="agent-status-badge account-badge" onclick="toggleAccountMenu()" title="Account & Authentication Gateway">
                         <svg class="account-svg-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -117,7 +113,6 @@
                 </div>
             </aside>
 
-            <!-- Center Workspace -->
             <main class="main-workspace">
                 <div class="chat-canvas view-section" id="chat-section">
                     <div class="step-card goal">
