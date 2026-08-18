@@ -17,12 +17,12 @@
     --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* ☀️ Crisp Pure White + Cherry Red Light Mode */
+/* ☀️ Crisp Pure White + Cherry Red Light Mode Overrides */
 body.light-theme {
     --bg-dark: #f8fafc;
-    --surface-glass: rgba(255, 255, 255, 0.94);
+    --surface-glass: rgba(255, 255, 255, 0.96);
     --surface-card: #ffffff;
-    --border-glass: rgba(205, 0, 41, 0.25);
+    --border-glass: rgba(205, 0, 41, 0.3);
     --cherry-border: rgba(205, 0, 41, 0.45);
     --cherry-subtle: rgba(205, 0, 41, 0.08);
     --white: #0f172a;
@@ -31,6 +31,75 @@ body.light-theme {
     --text-main: #0f172a;
     --text-muted-theme: #334155;
     --input-bg: #ffffff;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .sidebar-nav,
+body.light-theme .workspace-header,
+body.light-theme .metrics-panel,
+body.light-theme .input-dock {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgba(205, 0, 41, 0.35) !important;
+}
+
+body.light-theme .main-workspace {
+    background: rgba(248, 250, 252, 0.8) !important;
+    border-color: rgba(205, 0, 41, 0.35) !important;
+}
+
+body.light-theme .step-card,
+body.light-theme .prompt-chip,
+body.light-theme .metric-card,
+body.light-theme .tool-card-box,
+body.light-theme .vault-card-box,
+body.light-theme .swarm-card,
+body.light-theme .tools-header-banner,
+body.light-theme .memory-header-banner,
+body.light-theme .memory-input-card,
+body.light-theme .memory-chip,
+body.light-theme .agent-status-badge {
+    background: #ffffff !important;
+    border-color: rgba(205, 0, 41, 0.45) !important;
+    box-shadow: 0 4px 20px rgba(205, 0, 41, 0.12) !important;
+}
+
+body.light-theme .step-title,
+body.light-theme .prompt-title,
+body.light-theme .tool-name,
+body.light-theme .metric-val,
+body.light-theme .panel-section-title,
+body.light-theme .header-title-block h1,
+body.light-theme .brand-main,
+body.light-theme .status-text,
+body.light-theme .tools-header-banner h2,
+body.light-theme .memory-header-banner h2,
+body.light-theme .memory-input-card h3,
+body.light-theme .swarm-info h3,
+body.light-theme .vault-tag {
+    color: #0f172a !important;
+}
+
+body.light-theme .step-content,
+body.light-theme .prompt-desc,
+body.light-theme .tool-desc,
+body.light-theme .vault-text,
+body.light-theme .metric-label,
+body.light-theme .header-subtitle,
+body.light-theme .swarm-info p,
+body.light-theme .tools-header-banner p,
+body.light-theme .memory-header-banner p {
+    color: #334155 !important;
+}
+
+body.light-theme .input-wrapper {
+    background: #ffffff !important;
+    border-color: #cd0029 !important;
+    box-shadow: 0 0 16px rgba(205, 0, 41, 0.2) !important;
+}
+
+body.light-theme .input-box {
+    color: #0f172a !important;
 }
 
 * {
@@ -60,7 +129,7 @@ body {
     pointer-events: all;
 }
 
-/* 3-Column Glass Layout */
+/* 3-Column Layout */
 .app-container {
     position: relative;
     z-index: 10;
@@ -232,10 +301,6 @@ body {
     position: relative;
 }
 
-body.light-theme .main-workspace {
-    background: rgba(255, 255, 255, 0.5);
-}
-
 .workspace-header {
     display: flex;
     align-items: center;
@@ -265,52 +330,53 @@ body.light-theme .main-workspace {
     gap: 16px;
 }
 
-/* 🌟 Luxury 3D Animated Slider Toggle (Exact Match to Reference Photo) */
+/* 🌟 Luxury 3D Animated Slider (Exact Reference Match, Zero Overlap) */
 .theme-switch-btn {
     position: relative;
-    width: 138px;
-    height: 42px;
-    border-radius: 26px;
+    width: 155px;
+    height: 44px;
+    border-radius: 28px;
     background: linear-gradient(135deg, #180208, #3b0512);
     border: 2px solid var(--cherry-border);
     cursor: pointer;
-    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.7), 0 0 14px rgba(205, 0, 41, 0.35);
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.7), 0 0 16px rgba(205, 0, 41, 0.35);
     display: flex;
     align-items: center;
-    padding: 0 12px;
+    position: relative;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
     user-select: none;
+    overflow: hidden;
 }
 
 body.light-theme .theme-switch-btn {
-    background: linear-gradient(135deg, #ff7a18, #ff1a47, #cd0029);
-    border-color: #ff1a47;
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 26, 71, 0.5);
+    background: linear-gradient(135deg, #ff7a18, #ff1a47, #cd0029) !important;
+    border-color: #ff1a47 !important;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 22px rgba(255, 26, 71, 0.5) !important;
 }
 
 .switch-label-night {
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     font-weight: 900;
     letter-spacing: 1px;
     color: #ffffff;
-    margin-left: auto;
-    padding-right: 6px;
+    position: absolute;
+    right: 16px;
     display: block;
 }
 
 .switch-label-day {
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     font-weight: 900;
     letter-spacing: 1px;
     color: #ffffff;
-    margin-right: auto;
-    padding-left: 6px;
+    position: absolute;
+    left: 16px;
     display: none;
 }
 
-body.light-theme .switch-label-night { display: none; }
-body.light-theme .switch-label-day { display: block; }
+body.light-theme .switch-label-night { display: none !important; }
+body.light-theme .switch-label-day { display: block !important; }
 
 .switch-knob {
     position: absolute;
@@ -324,14 +390,14 @@ body.light-theme .switch-label-day { display: block; }
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 1.05rem;
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
 }
 
 body.light-theme .switch-knob {
-    transform: translateX(92px);
-    box-shadow: 0 4px 12px rgba(205, 0, 41, 0.45);
+    transform: translateX(107px) !important;
+    box-shadow: 0 4px 14px rgba(205, 0, 41, 0.45) !important;
 }
 
 .btn-sound-toggle {
