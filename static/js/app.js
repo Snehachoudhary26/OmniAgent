@@ -1,32 +1,28 @@
 /**
- * OmniAgent Studio Controller with 3D Luxury Slider Toggle
+ * OmniAgent Studio Complete Application Controller & Theme Engine
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
 
-// 3D Slider Toggle
-window.toggleTheme = function() {
+// Toggle Theme Handler
+function toggleThemeAction() {
     currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('omni_theme', currentTheme);
     applyTheme(currentTheme);
     playCyberSound('step');
-};
+}
 
 function applyTheme(theme) {
-    const textElem = document.getElementById('switch-mode-text');
-    const iconElem = document.getElementById('switch-knob-icon');
-
+    const knob = document.getElementById('switch-knob-icon');
     if (theme === 'light') {
         document.body.classList.add('light-theme');
-        if (textElem) textElem.textContent = 'DAY';
-        if (iconElem) iconElem.textContent = '☀️';
+        if (knob) knob.textContent = '☀️';
         if (window.orbitalBg) window.orbitalBg.setTheme('light');
     } else {
         document.body.classList.remove('light-theme');
-        if (textElem) textElem.textContent = 'NIGHT';
-        if (iconElem) iconElem.textContent = '🌙';
+        if (knob) knob.textContent = '🌙';
         if (window.orbitalBg) window.orbitalBg.setTheme('dark');
     }
 }
@@ -383,6 +379,12 @@ window.saveNewMemory = async function() {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme(currentTheme);
     initWebSocket();
+
+    // Direct binding for the 3D slider button
+    const themeBtn = document.getElementById('theme-slider-btn');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', toggleThemeAction);
+    }
 
     const btnSend = document.getElementById('btn-send');
     const input = document.getElementById('user-input');
