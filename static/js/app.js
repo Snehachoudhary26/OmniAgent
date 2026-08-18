@@ -1,12 +1,12 @@
 /**
- * OmniAgent Studio Complete Controller with Mechanical Typing Sound Engine
+ * OmniAgent Studio Complete Controller with Feather-Light iOS/Mac Keyboard Sound
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
 
-// Luxury Cyber Sound & Mechanical Typing Synthesizer
+// Authentic Feather-Light iOS / Mac Keyboard Tap & Audio Engine
 function playCyberSound(type) {
     if (!soundEnabled) return;
     try {
@@ -16,96 +16,99 @@ function playCyberSound(type) {
         const now = audioCtx.currentTime;
 
         if (type === 'type') {
-            // ⌨️ Tactile Mechanical Keyboard Switch Click ("Thock")
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            const filter = audioCtx.createBiquadFilter();
+            // 📱 Authentic Feather-Light iPhone / Mac Keyboard Soft Tap
+            const bufferSize = audioCtx.sampleRate * 0.015; // 15ms short click
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+            }
 
-            osc.connect(filter);
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(2400 + Math.random() * 300, now);
+            filter.Q.setValueAtTime(3.5, now);
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.045, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
+
+            noise.connect(filter);
             filter.connect(gain);
             gain.connect(audioCtx.destination);
 
-            // Realistic switch frequency variation
-            const baseFreq = 700 + Math.random() * 400;
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(baseFreq, now);
-            osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.4, now + 0.035);
-
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(1600, now);
-
-            gain.gain.setValueAtTime(0.09, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-
-            osc.start(now);
-            osc.stop(now + 0.035);
+            noise.start(now);
+            noise.stop(now + 0.015);
         } else if (type === 'click') {
-            // Elegant glass tactile click
+            // Soft Glass UI Click
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, now);
-            osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
-            gain.gain.setValueAtTime(0.12, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            osc.frequency.setValueAtTime(900, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.04);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
             osc.start(now);
-            osc.stop(now + 0.05);
+            osc.stop(now + 0.04);
         } else if (type === 'send') {
-            // High-voltage warp swoosh chord
-            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            // Soft Harmonic Swoosh
+            [523.25, 659.25, 783.99].forEach((freq, i) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.type = 'triangle';
+                osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, now + i * 0.03);
-                gain.gain.setValueAtTime(0.08, now + i * 0.03);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                gain.gain.setValueAtTime(0.05, now + i * 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
                 osc.start(now + i * 0.03);
-                osc.stop(now + 0.22);
+                osc.stop(now + 0.18);
             });
         } else if (type === 'step') {
-            // Futuristic pulse chime
+            // Soft Notification Chime
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(987.77, now);
-            osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.09);
-            gain.gain.setValueAtTime(0.12, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+            osc.frequency.setValueAtTime(1046.50, now);
+            osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.07);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
             osc.start(now);
-            osc.stop(now + 0.09);
+            osc.stop(now + 0.07);
         } else if (type === 'alert') {
-            // Human approval critical alert
-            [440, 880].forEach((freq, i) => {
+            // Soft Attention Chime
+            [587.33, 880].forEach((freq, i) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(freq, now + i * 0.1);
-                gain.gain.setValueAtTime(0.15, now + i * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                osc.start(now + i * 0.1);
-                osc.stop(now + 0.25);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                gain.gain.setValueAtTime(0.08, now + i * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.start(now + i * 0.08);
+                osc.stop(now + 0.2);
             });
         } else if (type === 'complete') {
-            // Triumph harmonic victory chord
+            // Elegant Soft Completion Chime
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-                gain.gain.setValueAtTime(0.14, now + idx * 0.07);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-                osc.start(now + idx * 0.07);
-                osc.stop(now + 0.45);
+                osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+                gain.gain.setValueAtTime(0.08, now + idx * 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.start(now + idx * 0.06);
+                osc.stop(now + 0.35);
             });
         }
     } catch (e) {}
@@ -453,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnSend) btnSend.addEventListener('click', sendUserPrompt);
     if (input) {
-        // ⌨️ Mechanical Keyboard Typing Audio on Keystrokes
+        // 📱 Soft Native iOS / Mac Key Click on Keystrokes
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 sendUserPrompt();
