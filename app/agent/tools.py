@@ -52,13 +52,16 @@ class ToolRegistry:
 
     def _calculate(self, expression: str) -> Dict[str, Any]:
         try:
-            # Clean common words and prefixes from prompt
+            # 1. Clean words, colons, and unicode arrows (e.g. '→', 'alculate', 'math:', etc.)
             clean_expr = expression
-            for prefix in ["calculate", "math:", "math", "what is", "solve", "evaluate", ":"]:
-                clean_expr = re.sub(r'(?i)\b' + re.escape(prefix) + r'\b', '', clean_expr)
+            # Remove any non-math unicode symbols like arrows or bullets
+            clean_expr = re.sub(r'[→➔➤•#$@!~`]', '', clean_expr)
+            # Remove common prompt words
+            for word in ["calculate", "alculate", "math", "what is", "solve", "evaluate"]:
+                clean_expr = re.sub(r'(?i)\b' + re.escape(word) + r'\b', '', clean_expr)
             clean_expr = clean_expr.replace(":", "").strip()
 
-            # Populate safe math environment
+            # Safe math environment
             safe_env = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
             safe_env["sqrt"] = math.sqrt
             safe_env["pi"] = math.pi
@@ -68,13 +71,20 @@ class ToolRegistry:
             safe_env["abs"] = abs
 
             result = eval(clean_expr, {"__builtins__": {}}, safe_env)
-            return {"output": f"Calculated Result: {result}", "citations": []}
+            return {"output": f"Result: {result} (Evaluated: {clean_expr})", "citations": []}
         except Exception as e:
-            return {"output": f"Math error: {str(e)}", "citations": []}
+            # Self-healing fallback: extract pure mathematical characters
+            try:
+                pure_math = re.sub(r'[^0-9+\-*/().sqrtpi\s]', '', expression).strip()
+                safe_env = {"sqrt": math.sqrt, "pi": math.pi}
+                result = eval(pure_math, {"__builtins__": {}}, safe_env)
+                return {"output": f"Result: {result} (Self-Healed Expression: {pure_math})", "citations": []}
+            except Exception:
+                return {"output": f"Calculation Error: Could not parse expression '{expression}'", "citations": []}
 
     def _duckduckgo_search(self, query: str) -> Dict[str, Any]:
         try:
-            clean_query = query.replace("search", "").replace("find", "").replace("latest", "").strip()
+            clean_query = query.replace("search", "").replace("find", "").replace("latest", "").replace("→", "").strip()
             encoded = urllib.parse.quote_plus(clean_query if clean_query else query)
             url = f"https://html.duckduckgo.com/html/?q={encoded}"
             headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
