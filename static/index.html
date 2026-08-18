@@ -25,6 +25,11 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span>Agent Swarm</span>
                 </li>
+                <!-- ➕ Add-On 2: Code Sandbox Tab -->
+                <li class="nav-item" id="nav-code" onclick="showSection('code')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    <span>Code Sandbox</span>
+                </li>
                 <li class="nav-item" id="nav-tools" onclick="showSection('tools')">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span>Multi-Tools</span>
@@ -51,7 +56,7 @@
                 </div>
                 
                 <div class="header-controls">
-                    <!-- ➕ Add-On: Export Trajectory Dropdown -->
+                    <!-- Export Trajectory Dropdown -->
                     <div class="export-dropdown-wrapper">
                         <button class="btn-action-header" id="btn-export-menu" onclick="toggleExportMenu()" title="Export Session Trajectory">
                             📥 Export
@@ -62,7 +67,7 @@
                         </div>
                     </div>
 
-                    <!-- ➕ Add-On: Clear Session Button -->
+                    <!-- Clear Session Button -->
                     <button class="btn-action-header" id="btn-clear-session" onclick="clearSession()" title="Clear Current Chat Session">
                         🗑️ Clear
                     </button>
@@ -153,6 +158,54 @@
                 </div>
             </div>
 
+            <!-- ➕ Add-On 2: Code Sandbox Interactive View -->
+            <div class="code-canvas view-section" id="code-section" style="display:none;">
+                <div class="tools-header-banner">
+                    <h2>🐍 Interactive Python Sandbox & REPL</h2>
+                    <p>Execute safe Python code algorithms, inspect console outputs in real-time, or ask OmniAgent to refactor.</p>
+                </div>
+
+                <div class="code-editor-card">
+                    <div class="code-editor-header">
+                        <div class="code-templates-bar">
+                            <span class="code-template-label">Templates:</span>
+                            <button class="btn-template-chip" onclick="loadCodeTemplate('fibonacci')">Fibonacci Sequence</button>
+                            <button class="btn-template-chip" onclick="loadCodeTemplate('primes')">Prime Numbers</button>
+                            <button class="btn-template-chip" onclick="loadCodeTemplate('matrix')">Matrix Simulation</button>
+                        </div>
+                        <div class="code-header-actions">
+                            <button class="btn-tool-subtle" onclick="copySandboxCode()">📋 Copy</button>
+                            <button class="btn-tool-subtle" onclick="clearSandboxCode()">🧹 Clear</button>
+                        </div>
+                    </div>
+
+                    <textarea id="sandbox-code-input" class="code-textarea" spellcheck="false" placeholder="# Write Python code here...
+def compute_squares(n):
+    return [i**2 for i in range(1, n+1)]
+
+print(compute_squares(10))"></textarea>
+
+                    <div class="code-actions-footer">
+                        <button class="btn-run-code" onclick="executeSandboxCode()">
+                            <span>▶️ Run Code</span>
+                        </button>
+                        <button class="btn-agent-optimize" onclick="sendCodeToAgent()">
+                            <span>🤖 Ask Agent to Refactor</span>
+                        </button>
+                        <span id="code-latency-badge" class="code-latency-badge">Latency: 0 ms</span>
+                    </div>
+                </div>
+
+                <!-- Live Output Console -->
+                <div class="code-output-card">
+                    <div class="code-output-header">
+                        <span>📟 Execution Console Output (stdout)</span>
+                        <span id="code-status-pill" class="code-status-pill">Ready</span>
+                    </div>
+                    <pre id="sandbox-console-output" class="code-console-body">Press '▶️ Run Code' to execute your Python script...</pre>
+                </div>
+            </div>
+
             <!-- 3. Multi-Tools Registry View -->
             <div class="tools-canvas view-section" id="tools-section" style="display:none;">
                 <div class="tools-header-banner">
@@ -238,6 +291,10 @@
         <button class="mobile-nav-btn" onclick="showSection('swarm')">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             <span>Swarm</span>
+        </button>
+        <button class="mobile-nav-btn" onclick="showSection('code')">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            <span>Code</span>
         </button>
         <button class="mobile-nav-btn" onclick="showSection('tools')">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>

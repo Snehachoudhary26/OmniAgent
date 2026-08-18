@@ -1,10 +1,140 @@
 /**
- * OmniAgent Studio Complete Controller with Export & Session Manager
+ * OmniAgent Studio Complete Controller with Code Sandbox REPL
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+
+// 🐍 Code Sandbox Templates & Execution Controller
+const CODE_TEMPLATES = {
+    fibonacci: `# Fibonacci Sequence Algorithm Generator
+def generate_fibonacci(n):
+    sequence = [0, 1]
+    while len(sequence) < n:
+        sequence.append(sequence[-1] + sequence[-2])
+    return sequence
+
+fib_15 = generate_fibonacci(15)
+print("Fibonacci First 15 terms:", fib_15)
+print("Sum of Sequence:", sum(fib_15))`,
+
+    primes: `# Sieve of Eratosthenes Prime Number Finder
+def find_primes(limit):
+    primes = []
+    for num in range(2, limit + 1):
+        is_prime = True
+        for i in range(2, int(num**0.5) + 1):
+            if num % i == 0:
+                is_prime = False
+                break
+        if is_prime:
+            primes.append(num)
+    return primes
+
+result = find_primes(50)
+print(f"Total Primes <= 50: {len(result)}")
+print("Prime Numbers:", result)`,
+
+    matrix: `# Matrix Determinant & Eigen Simulation
+import math
+
+matrix = [
+    [4, 7],
+    [2, 6]
+]
+
+det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+trace = matrix[0][0] + matrix[1][1]
+
+print("Input 2x2 Matrix:", matrix)
+print(f"Matrix Determinant: {det}")
+print(f"Matrix Trace: {trace}")
+print(f"Square Root of Det: {math.sqrt(det):.4f}")`
+};
+
+window.loadCodeTemplate = function(name) {
+    playCyberSound('click');
+    const editor = document.getElementById('sandbox-code-input');
+    if (editor && CODE_TEMPLATES[name]) {
+        editor.value = CODE_TEMPLATES[name];
+        showDiagnosticToast(`Loaded template: ${name}`);
+    }
+};
+
+window.clearSandboxCode = function() {
+    playCyberSound('click');
+    const editor = document.getElementById('sandbox-code-input');
+    const consoleOut = document.getElementById('sandbox-console-output');
+    if (editor) editor.value = '';
+    if (consoleOut) consoleOut.textContent = "Editor cleared. Enter Python code and press '▶️ Run Code'...";
+};
+
+window.copySandboxCode = function() {
+    playCyberSound('click');
+    const editor = document.getElementById('sandbox-code-input');
+    if (editor) {
+        navigator.clipboard.writeText(editor.value);
+        showDiagnosticToast('📋 Code copied to clipboard!');
+    }
+};
+
+window.executeSandboxCode = async function() {
+    playCyberSound('send');
+    const editor = document.getElementById('sandbox-code-input');
+    const consoleOut = document.getElementById('sandbox-console-output');
+    const statusPill = document.getElementById('code-status-pill');
+    const latBadge = document.getElementById('code-latency-badge');
+
+    if (!editor || !editor.value.trim()) {
+        alert('Please enter some Python code to execute.');
+        return;
+    }
+
+    if (statusPill) { statusPill.textContent = 'Running...'; statusPill.style.color = '#fbbf24'; }
+    if (consoleOut) consoleOut.textContent = 'Executing sandbox container...';
+
+    try {
+        const res = await fetch('/api/code/run', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: editor.value })
+        });
+        const data = await res.json();
+
+        if (consoleOut) {
+            consoleOut.textContent = data.output || 'Code finished with no stdout output.';
+            consoleOut.style.color = (data.status === 'success') ? '#0be881' : '#ff3b5c';
+        }
+        if (statusPill) {
+            statusPill.textContent = (data.status === 'success') ? 'Exit Code 0 (Success)' : 'Runtime Error';
+            statusPill.style.color = (data.status === 'success') ? '#0be881' : '#ff3b5c';
+        }
+        if (latBadge) latBadge.textContent = `Latency: ${data.execution_ms} ms`;
+
+        playCyberSound('complete');
+        if (window.orbitalBg) window.orbitalBg.firePartyPopper('both');
+    } catch (e) {
+        if (consoleOut) {
+            consoleOut.textContent = `Sandbox Error: ${e.message}`;
+            consoleOut.style.color = '#ff3b5c';
+        }
+        if (statusPill) statusPill.textContent = 'Error';
+    }
+};
+
+window.sendCodeToAgent = function() {
+    playCyberSound('click');
+    const editor = document.getElementById('sandbox-code-input');
+    const code = editor ? editor.value.trim() : '';
+    if (!code) return alert('No code in editor to refactor.');
+
+    const prompt = `Please review, optimize, and explain this Python code:\n\`\`\`python\n${code}\n\`\`\``;
+    showSection('chat');
+    const input = document.getElementById('user-input');
+    if (input) input.value = prompt;
+    sendUserPrompt();
+};
 
 // 📥 Export Session Dropdown Handler
 window.toggleExportMenu = function() {
@@ -517,7 +647,7 @@ function sendUserPrompt() {
     input.value = '';
 }
 
-// 🔀 Active Tab Router
+// 🔀 Active Tab Router with Code Sandbox
 window.showSection = function(section) {
     playCyberSound('click');
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
@@ -537,6 +667,15 @@ window.showSection = function(section) {
         document.getElementById('view-title').textContent = 'Autonomous Sub-Agent Swarm';
         document.getElementById('view-subtitle').textContent = 'Live coordination across specialized agents';
         if (inputDock) inputDock.style.display = 'block';
+    } else if (section === 'code') {
+        document.getElementById('code-section').style.display = 'flex';
+        document.getElementById('nav-code').classList.add('active');
+        document.getElementById('view-title').textContent = 'Interactive Python Code Sandbox';
+        document.getElementById('view-subtitle').textContent = 'Live REPL Execution • Algorithmic Prototyping • Code Optimizer';
+        if (inputDock) inputDock.style.display = 'none';
+        if (!document.getElementById('sandbox-code-input').value) {
+            loadCodeTemplate('fibonacci');
+        }
     } else if (section === 'tools') {
         document.getElementById('tools-section').style.display = 'flex';
         document.getElementById('nav-tools').classList.add('active');

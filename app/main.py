@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -30,6 +31,7 @@ async def health_check():
         "status": "online",
         "service": "OmniAgent Autonomous Core",
         "version": "2.0.0",
+        "tools_count": len(agent_engine.tool_registry.tools),
         "free_mode": True
     }
 
@@ -58,6 +60,23 @@ async def process_approval(decision: ApprovalDecision):
         feedback=decision.feedback
     )
     return {"status": "processed", "steps": results}
+
+# ➕ Add-On 2: Interactive Live Code Execution Endpoint
+@app.post("/api/code/run")
+async def run_live_code(payload: dict):
+    code = payload.get("code", "")
+    if not code.strip():
+        raise HTTPException(status_code=400, detail="No code provided.")
+    
+    t0 = time.perf_counter()
+    result = agent_engine.tool_registry._run_python_sandbox(code)
+    exec_time = round((time.perf_counter() - t0) * 1000, 2)
+    
+    return {
+        "output": result.get("output", ""),
+        "execution_ms": exec_time,
+        "status": "success" if "Exception" not in result.get("output", "") else "error"
+    }
 
 @app.websocket("/ws/agent")
 async def websocket_agent_endpoint(websocket: WebSocket):

@@ -112,10 +112,29 @@ body.light-theme .tools-header-banner,
 body.light-theme .memory-header-banner,
 body.light-theme .memory-input-card,
 body.light-theme .memory-chip,
-body.light-theme .agent-status-badge {
+body.light-theme .agent-status-badge,
+body.light-theme .code-editor-card,
+body.light-theme .code-output-card {
     background: rgba(255, 255, 255, 0.95) !important;
     border-color: rgba(205, 0, 41, 0.4) !important;
     box-shadow: 0 6px 24px rgba(205, 0, 41, 0.1) !important;
+}
+
+body.light-theme .code-textarea {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-color: rgba(205, 0, 41, 0.35) !important;
+}
+
+body.light-theme .code-console-body {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .btn-template-chip {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-color: rgba(205, 0, 41, 0.35) !important;
 }
 
 body.light-theme .swarm-status-badge {
@@ -140,7 +159,8 @@ body.light-theme .tools-header-banner h2,
 body.light-theme .memory-header-banner h2,
 body.light-theme .memory-input-card h3,
 body.light-theme .swarm-info h3,
-body.light-theme .vault-tag {
+body.light-theme .vault-tag,
+body.light-theme .code-output-header span {
     color: #0f172a !important;
 }
 
@@ -416,7 +436,7 @@ body {
     gap: 12px;
 }
 
-/* ➕ Add-On: Header Action Buttons (Export & Clear) */
+/* Header Action Buttons */
 .btn-action-header {
     background: rgba(14, 2, 6, 0.85);
     color: var(--text-main);
@@ -581,7 +601,7 @@ body.light-theme .switch-knob {
 }
 
 /* Views & Canvases */
-.chat-canvas, .tools-canvas, .memory-canvas, .swarm-canvas {
+.chat-canvas, .tools-canvas, .memory-canvas, .swarm-canvas, .code-canvas {
     flex: 1;
     overflow-y: auto;
     padding: 28px;
@@ -591,12 +611,211 @@ body.light-theme .switch-knob {
     scroll-behavior: smooth;
 }
 
-.chat-canvas::-webkit-scrollbar, .tools-canvas::-webkit-scrollbar, .memory-canvas::-webkit-scrollbar, .swarm-canvas::-webkit-scrollbar {
+.chat-canvas::-webkit-scrollbar, .tools-canvas::-webkit-scrollbar, .memory-canvas::-webkit-scrollbar, .swarm-canvas::-webkit-scrollbar, .code-canvas::-webkit-scrollbar {
     width: 6px;
 }
-.chat-canvas::-webkit-scrollbar-thumb, .tools-canvas::-webkit-scrollbar-thumb, .memory-canvas::-webkit-scrollbar-thumb, .swarm-canvas::-webkit-scrollbar-thumb {
+.chat-canvas::-webkit-scrollbar-thumb, .tools-canvas::-webkit-scrollbar-thumb, .memory-canvas::-webkit-scrollbar-thumb, .swarm-canvas::-webkit-scrollbar-thumb, .code-canvas::-webkit-scrollbar-thumb {
     background: var(--cherry-red);
     border-radius: 10px;
+}
+
+/* ➕ Add-On 2: Interactive Code Editor Styles */
+.code-editor-card {
+    background: var(--surface-card);
+    border: 1.5px solid var(--cherry-border);
+    border-radius: 18px;
+    padding: 22px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.code-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.code-templates-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.code-template-label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--white-subtle);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-template-chip {
+    background: var(--input-bg);
+    border: 1px solid var(--cherry-border);
+    color: var(--text-main);
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-template-chip:hover {
+    background: var(--cherry-red);
+    color: #ffffff;
+    border-color: var(--cherry-red);
+}
+
+.code-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-tool-subtle {
+    background: transparent;
+    border: 1px solid var(--cherry-border);
+    color: var(--text-main);
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-tool-subtle:hover {
+    background: rgba(205, 0, 41, 0.2);
+    border-color: var(--cherry-red);
+}
+
+.code-textarea {
+    width: 100%;
+    height: 240px;
+    background: var(--input-bg);
+    border: 1.5px solid var(--cherry-border);
+    border-radius: 14px;
+    padding: 18px;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    tab-size: 4;
+}
+
+.code-textarea:focus {
+    border-color: var(--cherry-red);
+    box-shadow: 0 0 20px rgba(205, 0, 41, 0.4);
+}
+
+.code-actions-footer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.btn-run-code {
+    background: var(--cherry-red);
+    color: #ffffff;
+    border: 2px solid var(--cherry-red);
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--cherry-glow);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-run-code:hover {
+    background: #ff1a47;
+    transform: scale(1.05);
+}
+
+.btn-agent-optimize {
+    background: transparent;
+    color: var(--text-main);
+    border: 1.5px solid var(--cherry-red);
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-agent-optimize:hover {
+    background: var(--cherry-subtle);
+    border-color: var(--cherry-glow);
+}
+
+.code-latency-badge {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--white-subtle);
+    font-weight: 700;
+}
+
+/* Live Output Console */
+.code-output-card {
+    background: var(--surface-card);
+    border: 1.5px solid var(--cherry-border);
+    border-radius: 18px;
+    padding: 20px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.code-output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.code-status-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(205, 0, 41, 0.2);
+    border: 1px solid var(--cherry-border);
+    color: var(--text-main);
+}
+
+.code-console-body {
+    background: rgba(8, 1, 3, 0.95);
+    border: 1px solid rgba(205, 0, 41, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    color: #0be881;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    min-height: 110px;
+    max-height: 260px;
+    overflow-y: auto;
+    white-space: pre-wrap;
 }
 
 /* Swarm Grid */
