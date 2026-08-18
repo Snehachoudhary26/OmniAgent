@@ -1,4 +1,4 @@
-/* 🌟 Dedicated Single-Card Authentication Styling */
+/* 🌟 Dedicated Single-Card Authentication Styling with Free, Open Logo */
 
 .auth-page-wrapper {
     position: relative;
@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 20px 32px;
+    padding: 20px 36px;
     background: transparent;
     overflow-y: auto;
 }
@@ -17,9 +17,23 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1240px;
     margin: 0 auto;
-    padding: 8px 0 16px 0;
+    padding: 8px 0;
+}
+
+/* 🌌 Free & Open Logo Container (No enclosing card or border!) */
+.auth-header #brand-logo-container .omni-brand-core {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+body.light-theme .auth-header #brand-logo-container .omni-brand-core {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* Center Single Card Container */
