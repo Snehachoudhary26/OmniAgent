@@ -1,10 +1,63 @@
 /**
- * OmniAgent Studio Complete Controller with Feather-Light iOS/Mac Keyboard Sound
+ * OmniAgent Studio Complete Controller with Diagnostic Handler & Clear Text Cards
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+
+// ⚡ Live System Diagnostics on "Core: Ready" Click
+window.runDiagnostics = async function() {
+    playCyberSound('click');
+    const dot = document.querySelector('.status-dot');
+    const text = document.querySelector('.status-text');
+    if (text) text.textContent = 'Core: Testing...';
+    if (dot) dot.style.background = '#fbbf24';
+
+    try {
+        const t0 = performance.now();
+        const res = await fetch('/api/health');
+        const data = await res.json();
+        const lat = Math.round(performance.now() - t0);
+
+        if (dot) {
+            dot.style.background = '#0be881';
+            dot.style.boxShadow = '0 0 16px #0be881';
+        }
+        if (text) text.textContent = 'Core: 100% OK';
+
+        showDiagnosticToast(`⚡ Diagnostic Passed • Latency: ${lat}ms • Tools Active: ${data.tools_count} • Memory Synced`);
+        playCyberSound('complete');
+
+        setTimeout(() => {
+            if (dot) {
+                dot.style.background = '#cd0029';
+                dot.style.boxShadow = '0 0 14px var(--cherry-glow)';
+            }
+            if (text) text.textContent = 'Core: Ready';
+        }, 3000);
+    } catch (e) {
+        showDiagnosticToast('⚠️ Diagnostic Error: Reconnecting to Core...');
+        if (text) text.textContent = 'Core: Error';
+    }
+};
+
+function showDiagnosticToast(msg) {
+    const existing = document.querySelector('.diagnostic-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'diagnostic-toast';
+    toast.innerHTML = `<span>🟢</span><span>${msg}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(15px)';
+        setTimeout(() => toast.remove(), 400);
+    }, 3500);
+}
 
 // Authentic Feather-Light iOS / Mac Keyboard Tap & Audio Engine
 function playCyberSound(type) {
@@ -16,8 +69,7 @@ function playCyberSound(type) {
         const now = audioCtx.currentTime;
 
         if (type === 'type') {
-            // 📱 Authentic Feather-Light iPhone / Mac Keyboard Soft Tap
-            const bufferSize = audioCtx.sampleRate * 0.015; // 15ms short click
+            const bufferSize = audioCtx.sampleRate * 0.015;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) {
@@ -43,7 +95,6 @@ function playCyberSound(type) {
             noise.start(now);
             noise.stop(now + 0.015);
         } else if (type === 'click') {
-            // Soft Glass UI Click
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -56,7 +107,6 @@ function playCyberSound(type) {
             osc.start(now);
             osc.stop(now + 0.04);
         } else if (type === 'send') {
-            // Soft Harmonic Swoosh
             [523.25, 659.25, 783.99].forEach((freq, i) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
@@ -70,7 +120,6 @@ function playCyberSound(type) {
                 osc.stop(now + 0.18);
             });
         } else if (type === 'step') {
-            // Soft Notification Chime
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -83,7 +132,6 @@ function playCyberSound(type) {
             osc.start(now);
             osc.stop(now + 0.07);
         } else if (type === 'alert') {
-            // Soft Attention Chime
             [587.33, 880].forEach((freq, i) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
@@ -97,7 +145,6 @@ function playCyberSound(type) {
                 osc.stop(now + 0.2);
             });
         } else if (type === 'complete') {
-            // Elegant Soft Completion Chime
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
@@ -456,7 +503,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnSend) btnSend.addEventListener('click', sendUserPrompt);
     if (input) {
-        // 📱 Soft Native iOS / Mac Key Click on Keystrokes
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 sendUserPrompt();

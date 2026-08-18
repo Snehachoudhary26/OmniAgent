@@ -35,7 +35,8 @@
                 </li>
             </ul>
 
-            <div class="agent-status-badge">
+            <!-- ⚡ Interactive Diagnostic Button -->
+            <div class="agent-status-badge" onclick="runDiagnostics()" title="Click to test System Health & Latency">
                 <div class="status-dot"></div>
                 <span class="status-text">Core: Ready</span>
             </div>
@@ -50,7 +51,7 @@
                 </div>
                 
                 <div class="header-controls">
-                    <!-- 3D Luxury Slider Switcher (Direct Inline Onclick) -->
+                    <!-- 3D Luxury Slider Switcher -->
                     <button class="theme-switch-btn" id="theme-slider-btn" type="button" onclick="toggleTheme()" title="Toggle Day / Night Mode">
                         <span class="switch-label-night">NIGHT MODE</span>
                         <span class="switch-label-day">DAY MODE</span>
@@ -60,6 +61,8 @@
                     <button class="btn-sound-toggle" id="btn-sound" onclick="toggleAudio()" title="Toggle Sci-Fi Cyber Sound FX">
                         🔊 Sound: ON
                     </button>
+                    
+                    <!-- Clean High-Contrast Pill -->
                     <div class="model-pill">GEMINI-CORE / FREE TIER</div>
                 </div>
             </header>
