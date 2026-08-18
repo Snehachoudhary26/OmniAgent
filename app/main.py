@@ -53,7 +53,6 @@ async def add_memory(payload: dict):
     res = agent_engine.memory_vault.store_fact(text, tag)
     return {"status": "saved", "message": res}
 
-# ➕ Add-On 4: Document File Upload & Chunk Ingestion Endpoint
 @app.post("/api/memory/upload")
 async def upload_document_memory(file: UploadFile = File(...)):
     try:
@@ -63,7 +62,6 @@ async def upload_document_memory(file: UploadFile = File(...)):
         if not text_content:
             raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
-        # Chunk text into clean semantic paragraphs
         raw_chunks = [c.strip() for c in re.split(r'\n\s*\n', text_content) if len(c.strip()) > 15]
         if not raw_chunks:
             raw_chunks = [text_content[:300]]
@@ -72,7 +70,7 @@ async def upload_document_memory(file: UploadFile = File(...)):
         tag_name = f"Doc:{clean_filename[:20]}"
         
         saved_count = 0
-        for chunk in raw_chunks[:8]:  # Index top chunks
+        for chunk in raw_chunks[:8]:
             agent_engine.memory_vault.store_fact(chunk, tag=tag_name)
             saved_count += 1
 
@@ -84,7 +82,6 @@ async def upload_document_memory(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process document: {str(e)}")
 
-# ➕ Live Python Code Sandbox Endpoint
 @app.post("/api/code/run")
 async def run_live_code(payload: dict):
     code = payload.get("code", "")
@@ -120,6 +117,8 @@ async def websocket_agent_endpoint(websocket: WebSocket):
             prompt = data.get("prompt", "")
             api_key = data.get("api_key", None)
             model_provider = data.get("model_provider", "free-gemini")
+            persona = data.get("persona", "architect")
+            temperature = float(data.get("temperature", 0.7))
 
             if not prompt:
                 await websocket.send_json({"error": "Empty prompt received."})
@@ -129,7 +128,9 @@ async def websocket_agent_endpoint(websocket: WebSocket):
             async for step_packet in agent_engine.run_react_stream(
                 prompt=prompt,
                 api_key=api_key,
-                model_provider=model_provider
+                model_provider=model_provider,
+                persona=persona,
+                temperature=temperature
             ):
                 await websocket.send_json(step_packet)
 

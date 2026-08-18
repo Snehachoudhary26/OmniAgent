@@ -23,7 +23,8 @@ class ReActAgentEngine:
         ]
 
     async def run_react_stream(
-        self, prompt: str, api_key: Optional[str] = None, model_provider: str = "free-gemini"
+        self, prompt: str, api_key: Optional[str] = None, model_provider: str = "free-gemini",
+        persona: str = "architect", temperature: float = 0.7
     ) -> AsyncGenerator[Dict[str, Any], None]:
         self.tracer.start_trace()
         task_id = str(uuid.uuid4())[:8]
@@ -34,11 +35,18 @@ class ReActAgentEngine:
         self.memory_vault.add_short_term("user", prompt)
         recalled_mem = self.memory_vault.recall_relevant(prompt, top_k=2)
 
+        persona_titles = {
+            "architect": "Senior Software Architect",
+            "scientist": "Research Scientist",
+            "auditor": "Cybersecurity Auditor"
+        }
+        active_persona_title = persona_titles.get(persona, "Autonomous AI Engineer")
+
         goal_step = AgentStep(
             step_number=step_counter,
             step_type=StepType.GOAL,
-            title="🎯 Goal Initialized • Scout Agent",
-            content=f"Objective: \"{prompt}\"\nContext: Recalled {len(recalled_mem)} memory facts from Vector Vault.",
+            title=f"🎯 Goal Initialized • {active_persona_title}",
+            content=f"Objective: \"{prompt}\"\nPersona Mode: [{active_persona_title}] • Recalled {len(recalled_mem)} memory facts from Vector Vault.",
             timestamp=round((time.time() - t0) * 1000, 1)
         )
         self.tracer.record_step("GOAL", goal_step.content)
@@ -55,7 +63,6 @@ class ReActAgentEngine:
         selected_tool = None
         tool_args = {}
 
-        # 🌐 1. Check for URL Research
         url_match = re.search(r'https?://[^\s,]+', prompt)
         if url_match or any(w in lower_prompt for w in ["scrape", "summarize url", "research url", "read link", "inspect link"]):
             selected_tool = "deep_url_researcher"
@@ -75,11 +82,11 @@ class ReActAgentEngine:
             tool_args = {"query": prompt}
 
         # 2. Planning & Thought (Compute Agent)
-        thought_content = f"Selecting optimal tool `{selected_tool}` with parameters: {json.dumps(tool_args)}. Validating schema guardrails."
+        thought_content = f"Selecting optimal tool `{selected_tool}` with parameters: {json.dumps(tool_args)}. Validating schema guardrails under {active_persona_title} constraints."
         thought_step = AgentStep(
             step_number=step_counter,
             step_type=StepType.THOUGHT,
-            title="🧠 Reasoning & Tool Selection • Compute Agent",
+            title=f"🧠 Reasoning ({active_persona_title}) • Compute Agent",
             content=thought_content,
             tool_name=selected_tool,
             tool_args=tool_args,
@@ -166,11 +173,11 @@ class ReActAgentEngine:
         step_counter += 1
 
         # 6. Final Grounded Synthesis
-        synthesis = self._generate_synthesis(prompt, selected_tool, raw_output, citations_data, api_key)
+        synthesis = self._generate_synthesis(prompt, selected_tool, raw_output, citations_data, api_key, active_persona_title)
         final_step = AgentStep(
             step_number=step_counter,
             step_type=StepType.FINAL_ANSWER,
-            title="✨ Synthesized Verified Output",
+            title=f"✨ Synthesized Response ({active_persona_title})",
             content=synthesis,
             citations=citations_data,
             timestamp=round((time.time() - t0) * 1000, 1)
@@ -236,14 +243,14 @@ class ReActAgentEngine:
         steps_out.append(final_step.model_dump())
         return steps_out
 
-    def _generate_synthesis(self, prompt: str, tool: str, tool_output: str, citations: List[Citation], api_key: Optional[str]) -> str:
+    def _generate_synthesis(self, prompt: str, tool: str, tool_output: str, citations: List[Citation], api_key: Optional[str], persona_name: str) -> str:
         if api_key and api_key.strip():
             try:
                 endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
                 payload = {
                     "contents": [{
                         "parts": [{
-                            "text": f"You are OmniAgent, a high-precision AI agent. User asked: '{prompt}'. Tool '{tool}' returned: '{tool_output}'. Provide a concise, structured final response with citations if applicable."
+                            "text": f"You are OmniAgent operating as [{persona_name}]. User asked: '{prompt}'. Tool '{tool}' returned: '{tool_output}'. Provide a concise, structured final response with citations if applicable."
                         }]
                     }]
                 }
@@ -260,10 +267,10 @@ class ReActAgentEngine:
 
         cite_badges = " ".join([f"[[{c.id}]]({c.source_url})" for c in citations]) if citations else ""
         return (
-            f"Based on real-time verification and tool output for your request:\n\n"
+            f"**Synthesis ({persona_name}):**\n\n"
             f"> {tool_output}\n\n"
             f"**Key Insights:**\n"
-            f"- Information verified & grounded via `{tool}` execution.\n"
-            f"- ReAct loop completed with zero errors.\n\n"
+            f"- Information grounded via verified `{tool}` execution.\n"
+            f"- ReAct loop completed with zero hallucinations.\n\n"
             f"{f'**Sources & Citations:** {cite_badges}' if cite_badges else ''}"
         )

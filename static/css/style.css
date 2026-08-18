@@ -115,10 +115,21 @@ body.light-theme .memory-chip,
 body.light-theme .agent-status-badge,
 body.light-theme .code-editor-card,
 body.light-theme .code-output-card,
-body.light-theme .dropzone-card {
-    background: rgba(255, 255, 255, 0.95) !important;
+body.light-theme .dropzone-card,
+body.light-theme .settings-modal-card {
+    background: rgba(255, 255, 255, 0.98) !important;
     border-color: rgba(205, 0, 41, 0.4) !important;
     box-shadow: 0 6px 24px rgba(205, 0, 41, 0.1) !important;
+}
+
+body.light-theme .settings-select {
+    background: #ffffff !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .settings-header h2,
+body.light-theme .settings-field label {
+    color: #0f172a !important;
 }
 
 body.light-theme .dropzone-card {
@@ -627,7 +638,117 @@ body.light-theme .switch-knob {
     border-radius: 10px;
 }
 
-/* ➕ Add-On 4: Vector Vault Dropzone */
+/* ➕ Add-On 5: Settings Modal Backdrop */
+.settings-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-modal-backdrop.show {
+    display: flex;
+}
+
+.settings-modal-card {
+    background: rgba(14, 2, 6, 0.96);
+    border: 2px solid var(--cherry-red);
+    border-radius: 22px;
+    width: 90%;
+    max-width: 520px;
+    padding: 28px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 30px var(--cherry-glow);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    animation: slideUp 0.3s ease-out;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.settings-header h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: var(--white-subtle);
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+.btn-close-modal:hover {
+    color: var(--cherry-red);
+}
+
+.settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.settings-field label {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.settings-select {
+    background: var(--input-bg);
+    border: 1.5px solid var(--cherry-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.settings-slider {
+    width: 100%;
+    accent-color: var(--cherry-red);
+    cursor: pointer;
+}
+
+.settings-info-pill {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--cherry-border);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: #0be881;
+}
+
+.settings-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Vector Vault Dropzone */
 .dropzone-card {
     background: var(--surface-card);
     border: 2px dashed var(--cherry-border);

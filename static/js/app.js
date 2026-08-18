@@ -1,10 +1,46 @@
 /**
- * OmniAgent Studio Complete Controller with Vector Vault Document Ingestion
+ * OmniAgent Studio Complete Controller with Persona & Reasoning Configuration
  */
 let socket = null;
 let soundEnabled = true;
 let audioCtx = null;
 let currentTheme = localStorage.getItem('omni_theme') || 'dark';
+let activePersona = localStorage.getItem('omni_persona') || 'architect';
+let activeTemperature = parseFloat(localStorage.getItem('omni_temperature') || '0.7');
+
+// ⚙️ Settings Modal & Persona Controller
+window.toggleSettingsModal = function() {
+    playCyberSound('click');
+    const modal = document.getElementById('settings-modal');
+    if (modal) modal.classList.toggle('show');
+};
+
+window.closeSettingsModal = function(e) {
+    const modal = document.getElementById('settings-modal');
+    if (modal && e.target === modal) modal.classList.remove('show');
+};
+
+window.updatePersonaSetting = function() {
+    const sel = document.getElementById('persona-select');
+    if (sel) activePersona = sel.value;
+};
+
+window.saveSettings = function() {
+    playCyberSound('complete');
+    const sel = document.getElementById('persona-select');
+    const slider = document.getElementById('temp-slider');
+
+    if (sel) activePersona = sel.value;
+    if (slider) activeTemperature = parseFloat(slider.value);
+
+    localStorage.setItem('omni_persona', activePersona);
+    localStorage.setItem('omni_temperature', activeTemperature);
+
+    const modal = document.getElementById('settings-modal');
+    if (modal) modal.classList.remove('show');
+
+    showDiagnosticToast(`⚙️ Persona Updated: ${sel ? sel.options[sel.selectedIndex].text.split('(')[0].trim() : activePersona}`);
+};
 
 // 📂 Document Drag & Drop / Upload Ingestion Handler
 window.handleFileUpload = async function(event) {
@@ -226,7 +262,7 @@ window.exportSession = function(format) {
     if (format === 'md') {
         let mdContent = `# 🚀 OmniAgent Autonomous Reasoning Trajectory\n\n`;
         mdContent += `**Export Timestamp:** ${new Date().toLocaleString()}\n`;
-        mdContent += `**Total Tokens:** ${tokVal} | **Real-Time Latency:** ${latVal} | **Estimated Cost:** ${costVal}\n\n`;
+        mdContent += `**Persona:** ${activePersona} | **Total Tokens:** ${tokVal} | **Real-Time Latency:** ${latVal} | **Estimated Cost:** ${costVal}\n\n`;
         mdContent += `---\n\n`;
 
         cards.forEach((card, index) => {
@@ -251,6 +287,7 @@ window.exportSession = function(format) {
         const telemetry = {
             session_id: `omni_${timestamp}`,
             exported_at: new Date().toISOString(),
+            persona: activePersona,
             metrics: { tokens: tokVal, latency: latVal, cost: costVal },
             trajectory: []
         };
@@ -692,7 +729,11 @@ function sendUserPrompt() {
     updateAgentStatus('Core: Thinking & Executing...', true);
     playCyberSound('send');
 
-    socket.send(JSON.stringify({ prompt: prompt }));
+    socket.send(JSON.stringify({
+        prompt: prompt,
+        persona: activePersona,
+        temperature: activeTemperature
+    }));
     input.value = '';
 }
 
@@ -825,4 +866,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const sel = document.getElementById('persona-select');
+    const slider = document.getElementById('temp-slider');
+    const tempLabel = document.getElementById('temp-val-label');
+    if (sel) sel.value = activePersona;
+    if (slider) slider.value = activeTemperature;
+    if (tempLabel) tempLabel.textContent = activeTemperature;
 });

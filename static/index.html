@@ -55,6 +55,11 @@
                 </div>
                 
                 <div class="header-controls">
+                    <!-- ➕ Add-On 5: Settings / Persona Button -->
+                    <button class="btn-action-header" id="btn-settings-modal" onclick="toggleSettingsModal()" title="Configure Agent Persona & Reasoning Controls">
+                        ⚙️ Persona
+                    </button>
+
                     <!-- Export Trajectory Dropdown -->
                     <div class="export-dropdown-wrapper">
                         <button class="btn-action-header" id="btn-export-menu" onclick="toggleExportMenu()" title="Export Session Trajectory">
@@ -221,7 +226,6 @@ print(compute_squares(10))"></textarea>
                     <p>Persistent facts and document knowledge recalled during ReAct reasoning.</p>
                 </div>
 
-                <!-- ➕ Add-On 4: File Drag-and-Drop Dropzone -->
                 <div class="dropzone-card" id="vault-dropzone" onclick="document.getElementById('vault-file-input').click()">
                     <input type="file" id="vault-file-input" style="display:none;" accept=".txt,.md,.json,.csv,.py,.pdf" onchange="handleFileUpload(event)">
                     <div class="dropzone-icon">📂</div>
@@ -284,9 +288,44 @@ print(compute_squares(10))"></textarea>
             <div class="memory-chip-list" id="memory-chip-list">
                 <div class="memory-chip">📌 Architecture: Hybrid ReAct Planner</div>
                 <div class="memory-chip">📌 Safety: Human Approval Gateway Active</div>
-                <div class="memory-chip">📌 Tools: Web Search, Deep URL Scraper, Python Sandbox, Math</div>
+                <div class="memory-chip">📌 Persona: Senior Software Architect</div>
             </div>
         </aside>
+    </div>
+
+    <!-- ➕ Add-On 5: Settings & Persona Modal -->
+    <div class="settings-modal-backdrop" id="settings-modal" onclick="closeSettingsModal(event)">
+        <div class="settings-modal-card" onclick="event.stopPropagation()">
+            <div class="settings-header">
+                <h2>⚙️ Agent Persona & Reasoning Controller</h2>
+                <button class="btn-close-modal" onclick="toggleSettingsModal()">✕</button>
+            </div>
+            
+            <div class="settings-body">
+                <div class="settings-field">
+                    <label>🎭 Active Agent Persona</label>
+                    <select id="persona-select" class="settings-select" onchange="updatePersonaSetting()">
+                        <option value="architect">Senior Software Architect (Clean Architecture & Code)</option>
+                        <option value="scientist">Research Scientist (Deep Analysis & Grounded Citations)</option>
+                        <option value="auditor">Cybersecurity Auditor (Strict Safety & Vulnerability Scrutiny)</option>
+                    </select>
+                </div>
+
+                <div class="settings-field">
+                    <label>🌡️ Reasoning Temperature: <span id="temp-val-label">0.7</span></label>
+                    <input type="range" id="temp-slider" min="0.0" max="1.0" step="0.1" value="0.7" class="settings-slider" oninput="document.getElementById('temp-val-label').textContent = this.value">
+                </div>
+
+                <div class="settings-field">
+                    <label>⚡ Active Model Engine</label>
+                    <div class="settings-info-pill">Gemini-Core High-Throughput Free Tier (Active)</div>
+                </div>
+            </div>
+
+            <div class="settings-footer">
+                <button class="btn-approve" onclick="saveSettings()">Save & Apply</button>
+            </div>
+        </div>
     </div>
 
     <!-- Mobile Navigation -->
